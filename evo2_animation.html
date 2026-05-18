@@ -12,11 +12,11 @@
   header { text-align:center; padding:30px 20px 10px; }
   header h1 { font-size:2.2rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  header p { color:#8892a8; margin-top:6px; font-size:0.95rem; }
+  header p { color:#8892a8; margin-top:6px; font-size:0.95rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.5; }
 
   /* ── Controls ── */
   #controls { display:flex; justify-content:center; gap:14px; padding:16px; flex-wrap:wrap; }
-  button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:9px 22px; border-radius:8px; cursor:pointer; font-size:.9rem; transition:.2s; }
+  button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:9px 22px; border-radius:8px; cursor:pointer; font-size:.9rem; transition:.2s; font-family:inherit; }
   button:hover { background:#24304e; border-color:#4fc3f7; color:#fff; }
   button.active { background:#1b2d4d; border-color:#4fc3f7; color:#4fc3f7; }
   #speed-label { color:#6b7a96; font-size:.85rem; align-self:center; }
@@ -28,22 +28,41 @@
   /* ── Info panel ── */
   #info { max-width:900px; margin:20px auto; padding:24px 30px; background:#111828; border:1px solid #1e2a44; border-radius:12px; min-height:100px; transition:opacity .4s; }
   #info h2 { font-size:1.15rem; color:#4fc3f7; margin-bottom:8px; }
-  #info p { line-height:1.6; font-size:.92rem; color:#a0adc4; }
+  #info p, #info .main-text { line-height:1.7; font-size:.95rem; color:#b8c4d8; }
   .hl { color:#ce93d8; font-weight:600; }
   .hl2 { color:#4fc3f7; font-weight:600; }
   .hl3 { color:#81c784; font-weight:600; }
+
+  /* ── Analogy box ── */
+  .analogy { background:#0f1a2e; border-left:3px solid #ffa726; border-radius:0 8px 8px 0; padding:12px 16px; margin:12px 0; font-size:.9rem; color:#d4c8a8; }
+  .analogy::before { content:'Analogy: '; font-weight:700; color:#ffa726; }
+
+  /* ── Jargon buster ── */
+  .jargon { display:inline-flex; align-items:center; gap:4px; background:#4fc3f70e; border:1px solid #4fc3f733; border-radius:6px; padding:2px 8px; font-size:.82rem; color:#4fc3f7; cursor:help; position:relative; }
+  .jargon .tip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:#1a2848; border:1px solid #2e4a6e; border-radius:8px; padding:10px 14px; font-size:.82rem; color:#b0c4de; width:280px; z-index:10; line-height:1.5; box-shadow:0 4px 20px #0008; text-align:left; }
+  .jargon:hover .tip { display:block; }
+
+  /* ── Key takeaway ── */
+  .takeaway { background:#81c78412; border:1px solid #81c78433; border-radius:8px; padding:10px 14px; margin:10px 0; font-size:.88rem; color:#a8d8a0; }
+  .takeaway::before { content:'Key idea: '; font-weight:700; color:#81c784; }
 
   /* ── Legend ── */
   #legend { display:flex; justify-content:center; gap:24px; padding:12px; flex-wrap:wrap; font-size:.82rem; }
   .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
   .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; }
+
+  /* ── Back link ── */
+  .back-link { position:absolute; top:16px; left:20px; color:#4fc3f7; text-decoration:none; font-size:.9rem; z-index:10; }
+  .back-link:hover { text-decoration:underline; }
 </style>
 </head>
 <body>
 
+<a class="back-link" href="index.html">&larr; All Models</a>
+
 <header>
   <h1>Evo 2 — Genomic Foundation Model</h1>
-  <p>StripedHyena-2 architecture &middot; 7B parameters &middot; up to 1 M nucleotide context</p>
+  <p>A deep learning model that reads DNA like a language model reads text. It learns the "grammar" of genomes from billions of DNA sequences across all life on Earth, then predicts what comes next in a DNA sequence.</p>
 </header>
 
 <div id="controls">
@@ -57,17 +76,17 @@
 </div>
 
 <div id="legend">
-  <div class="leg"><span style="background:#4fc3f7"></span> Data flow</div>
-  <div class="leg"><span style="background:#81c784"></span> Hyena Conv (Short / Med / Long)</div>
-  <div class="leg"><span style="background:#ce93d8"></span> Multi-Head Attention</div>
-  <div class="leg"><span style="background:#ffb74d"></span> MLP / Feed-Forward</div>
-  <div class="leg"><span style="background:#ef5350"></span> Residual connection</div>
+  <div class="leg"><span style="background:#4fc3f7"></span> Data flowing through the model</div>
+  <div class="leg"><span style="background:#81c784"></span> Pattern detectors (short / medium / long range)</div>
+  <div class="leg"><span style="background:#ce93d8"></span> Attention (comparing all positions)</div>
+  <div class="leg"><span style="background:#ffb74d"></span> Thinking layers (processing information)</div>
+  <div class="leg"><span style="background:#ef5350"></span> Shortcut connections (preventing information loss)</div>
 </div>
 
 <div id="stage">
   <canvas id="c"></canvas>
 </div>
-<div id="info"><h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to step through how Evo 2 processes a raw DNA sequence and predicts the next nucleotide. Each stage is animated and explained below.</p></div>
+<div id="info"><h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to step through how Evo 2 processes a raw DNA sequence and predicts the next nucleotide. Each stage is animated and explained in plain language below. Hover over <span class="jargon" style="display:inline-flex">blue terms<span class="tip">These pop-up boxes explain technical terms in simple language. Hover over any blue term to see its definition!</span></span> for definitions.</p></div>
 
 <script>
 // ─── Canvas setup ───
@@ -103,33 +122,80 @@ const COL = {
   output: '#ffa726',
 };
 
-// ─── Steps definition ───
+// ─── Helper: jargon tooltip HTML ───
+function J(term, tip) {
+  return `<span class="jargon">${term}<span class="tip">${tip}</span></span>`;
+}
+
+// ─── Steps definition (beginner-friendly) ───
 const STEPS = [
-  { id:'input',   title:'Step 1 — DNA Input',
-    text:'Evo 2 takes a <span class="hl3">raw DNA string</span> as input — single nucleotides like A, T, G, C. No k-mer encoding, no byte-pair tokenization. The model sees the genome one base at a time, exactly as nature wrote it.' },
-  { id:'tokenize', title:'Step 2 — Character-Level Tokenization',
-    text:'Each nucleotide is mapped to an <span class="hl2">integer token ID</span> using a 512-token vocabulary (covers A/C/G/T/N plus special tokens). A 1 million bp genome becomes 1 million tokens — no information loss.' },
-  { id:'embed',   title:'Step 3 — Token Embedding',
-    text:'Token IDs index into a <span class="hl">learned embedding table</span> (512 &times; 4096 for the 7B model). Each nucleotide becomes a dense 4096-dimensional vector, forming a tensor of shape <b>[batch, seq_len, 4096]</b>.' },
-  { id:'hcs',     title:'Step 4 — Hyena Short Convolution (HCS)',
-    text:'The first layers use <span class="hl3">short convolution filters (~7 bp)</span>. These capture <b>local motifs</b>: dinucleotide frequencies, codon boundaries, small regulatory signals. The Hyena operator projects input into gating signals (x1, x2) and values (v), applies a causal conv, gates, then uses FFT-based convolution with a short learned filter. Cost: <b>O(L log L)</b>.' },
-  { id:'hcm',     title:'Step 5 — Hyena Medium Convolution (HCM)',
-    text:'Next come <span class="hl3">medium-range convolution layers (filter ~128 bp)</span>. These recognize <b>promoter-sized features</b>: TATA boxes, ribosome binding sites, regulatory elements spanning ~50–200 bp. Same Hyena gated-convolution mechanism, but the implicitly-parameterized filter spans a wider receptive field.' },
-  { id:'hcl',     title:'Step 6 — Hyena Long Convolution (HCL)',
-    text:'<span class="hl3">Long convolution layers</span> use filters that span the <b>entire sequence length</b> (up to 1M bp). These capture operons, gene neighborhoods, and chromosome-scale structure. The filter is generated by a small MLP with sinusoidal activations (implicit parametrization), keeping parameter count manageable. The FFT trick makes this O(L log L) instead of O(L&sup2;).' },
-  { id:'attn',    title:'Step 7 — Multi-Head Attention',
-    text:'Only <span class="hl">~16% of layers</span> (5 out of 32 in the 7B model) use standard <span class="hl">grouped-query attention with RoPE</span>. These provide <b>exact pairwise interactions</b> between all positions — critical for resolving long-range dependencies that convolution alone might miss (e.g., enhancer–promoter pairing). Flash Attention v2 keeps it efficient.' },
-  { id:'pattern', title:'Step 8 — The Layer Interleaving Pattern',
-    text:'Layers follow a repeating motif: <span class="hl3">HCS</span> &rarr; <span class="hl3">HCM</span> &rarr; <span class="hl3">HCL</span> &rarr; <span class="hl">Attention</span>. This creates a <b>multi-scale hierarchy</b>: local features are extracted first, then progressively longer-range patterns, punctuated by global attention for synchronization. Each layer also has an <span class="hl" style="color:#ffb74d">MLP block</span> (Gated Linear Unit + GELU) and <span class="hl" style="color:#ef5350">residual connections</span>.' },
-  { id:'output',  title:'Step 9 — Final Norm + Output Projection',
-    text:'After all 32 layers, a final <b>RMSNorm</b> stabilizes the representation. Then an <span class="hl" style="color:#ffa726">output projection</span> maps 4096-dim hidden states down to 512 logits (one per vocab token). A <b>softmax</b> gives the probability of the next nucleotide at every position.' },
-  { id:'predict', title:'Step 10 — Prediction & Generation',
-    text:'For <b>scoring</b>, the per-position log-likelihoods reveal how "natural" a sequence is — enabling zero-shot variant effect prediction. For <b>generation</b>, the model samples the next nucleotide, appends it, and repeats. Hyena layers can decode in <b>O(1) memory per step</b> via their state-space equivalence — no growing KV cache for 84% of layers.' },
+  { id:'input', title:'Step 1 — Reading the DNA',
+    text:`
+      <div class="main-text">Evo 2 starts by reading a <span class="hl3">raw DNA sequence</span> — the letters A, T, G, and C that make up every genome. Just like you read a sentence letter by letter, Evo 2 reads DNA <b>one nucleotide (letter) at a time</b>.</div>
+      <div class="analogy">Think of DNA as a book written in a 4-letter alphabet. While English has 26 letters, DNA only has 4: <b>A</b> (adenine), <b>T</b> (thymine), <b>G</b> (guanine), and <b>C</b> (cytosine). Evo 2 reads this book from left to right.</div>
+      <div class="takeaway">The input is just raw text — a string of A, T, G, C letters. No preprocessing or human-designed features needed.</div>
+    `},
+  { id:'tokenize', title:'Step 2 — Converting Letters to Numbers',
+    text:`
+      <div class="main-text">Computers cannot work with letters directly — they need numbers. So each DNA letter is assigned a unique number (called a ${J('token ID','A token is the smallest unit the model works with. Here, each nucleotide letter becomes one token. Token ID is just its assigned number in the dictionary.')}). For example: A&rarr;1, C&rarr;2, G&rarr;3, T&rarr;4. This step is called ${J('tokenization','Tokenization = splitting input into pieces and converting each piece to a number. Some AI models group multiple letters together, but Evo 2 keeps it simple: 1 letter = 1 token.')}.</div>
+      <div class="analogy">Imagine assigning jersey numbers to players. Each player (nucleotide) gets a unique number. The computer then works with these jersey numbers instead of names. A 1-million-letter genome becomes a list of 1 million numbers.</div>
+      <div class="takeaway">Each DNA letter becomes a simple number. The model has a "dictionary" of 512 possible tokens (A, C, G, T, N for unknown, plus some special markers).</div>
+    `},
+  { id:'embed', title:'Step 3 — Giving Each Letter a Rich Description',
+    text:`
+      <div class="main-text">A single number (like "3" for G) carries almost no information. So the model looks up each token in a big table and replaces it with a ${J('vector','A vector is a list of numbers. Think of it as a detailed description card. Instead of just "G = 3", the model uses a list of 4,096 numbers to describe G in a rich, nuanced way.')} — a list of <b>4,096 numbers</b>. This is called ${J('embedding','Embedding = converting a simple ID into a rich numerical description. The model learns these descriptions during training so that similar tokens get similar descriptions.')}.</div>
+      <div class="analogy">Imagine each DNA letter has a detailed profile card with 4,096 traits (like a character sheet in a game). "G" is no longer just the number 3 — it becomes a rich description that the model can reason about. These profiles are learned from billions of genomes during training.</div>
+      <div class="takeaway">Each nucleotide goes from a simple number to a rich list of 4,096 values. This is where the model starts to "understand" the meaning behind each letter.</div>
+    `},
+  { id:'hcs', title:'Step 4 — Scanning for Tiny Local Patterns',
+    text:`
+      <div class="main-text">Now the real processing begins. The first type of layer is a <span class="hl3">short-range pattern detector</span> (called ${J('Hyena Short Convolution','Hyena is the name of the mathematical technique used here. "Convolution" means sliding a small window across the sequence to detect patterns — like running a magnifying glass across a page. "Short" means the window is very small (~7 letters wide).')}). It slides a tiny window (~7 letters wide) across the DNA, looking for <b>small local patterns</b>.</div>
+      <div class="analogy">Imagine highlighting 3-letter words in a book. In DNA, a 3-letter pattern (codon) like "ATG" means "start building a protein here." This layer spots these small neighborhood patterns — dinucleotides (2-letter combos), codons (3-letter codes), and other tiny motifs.</div>
+      <div class="takeaway">This layer asks: "What small patterns exist in each tiny neighborhood?" It scans ~7 letters at a time to find local signals like codons and short regulatory motifs.</div>
+    `},
+  { id:'hcm', title:'Step 5 — Detecting Medium-Range Features',
+    text:`
+      <div class="main-text">Next, a <span class="hl3">medium-range pattern detector</span> (${J('Hyena Medium Convolution','Same sliding-window idea as the short convolution, but the window is now ~128 letters wide. This lets it see features that span a whole promoter or regulatory region.')}) scans the sequence with a wider window (~128 letters). This captures biological features like ${J('promoters','A promoter is a DNA region (usually 50-200 letters) that sits just before a gene and tells the cell "start reading the gene here." It is like a chapter title in our book analogy.')} and ${J('regulatory elements','Regulatory elements are DNA regions that control when and how much a gene is active. Think of them as volume knobs for genes — they can turn genes up, down, or off.')}.</div>
+      <div class="analogy">Now imagine reading whole sentences instead of individual words. You can understand things like "this sentence introduces a new paragraph" (a promoter introducing a gene). The medium window sees features that span 50-200 letters — things too big for the tiny window to catch.</div>
+      <div class="takeaway">This layer asks: "What paragraph-level patterns exist?" It detects promoters, ribosome binding sites, and other regulatory features spanning ~50-200 base pairs.</div>
+    `},
+  { id:'hcl', title:'Step 6 — Understanding Long-Range Relationships',
+    text:`
+      <div class="main-text">The <span class="hl3">long-range pattern detector</span> (${J('Hyena Long Convolution','The window now spans the ENTIRE sequence — up to 1 million letters. It uses a math trick called FFT (Fast Fourier Transform) to do this efficiently. Without this trick, processing 1 million positions would be impossibly slow.')}) looks at the <b>entire sequence at once</b> — up to 1 million letters! It captures relationships between distant parts of the genome, like how a ${J('regulatory region','A stretch of DNA, sometimes thousands of letters away from a gene, that still controls that gene. Like a remote control that works from across the room.')} far away can control a distant gene.</div>
+      <div class="analogy">Now imagine understanding how Chapter 1 of a book connects to Chapter 20. In genomes, a control switch can sit thousands of letters away from the gene it controls. This layer reads the whole book at once to find these long-distance connections. It uses a math shortcut (${J('FFT','Fast Fourier Transform — a clever math trick that lets the model process the entire sequence quickly. Without it, comparing every position to every other would take quadratically longer. With FFT, doubling the sequence length only slightly increases computation time.')}) to do this fast.</div>
+      <div class="takeaway">This layer asks: "How do distant parts of this genome relate to each other?" It can see connections spanning up to 1 million letters — entire operons, gene clusters, and chromosome-scale patterns.</div>
+    `},
+  { id:'attn', title:'Step 7 — Comparing Every Position to Every Other',
+    text:`
+      <div class="main-text">A small number of layers (~5 out of 32) use a different technique called ${J('attention','Attention lets every position in the sequence "look at" every other position and decide which ones are most relevant. It creates a score between every pair of positions — like a table showing how related each letter is to every other letter.')}. Unlike the sliding-window approach, attention lets <b>every single position directly communicate with every other position</b>. It creates a ${J('score matrix','A big table where each row and column is a position in the sequence. Each cell contains a score showing how "related" those two positions are. High scores mean the model thinks those positions are important to each other.')} showing how related each pair of positions is.</div>
+      <div class="analogy">Imagine a classroom where every student can pass notes to every other student simultaneously. The sliding-window layers are like students whispering to neighbors; attention is like an open discussion where everyone hears everyone. It also uses ${J('positional encoding (RoPE)','The model needs to know WHERE each letter is in the sequence (position 1 vs position 1000). RoPE (Rotary Position Embedding) is a way to encode "I am at position X" into the data, like page numbers in a book.')} — basically page numbers — so the model knows the position of each letter.</div>
+      <div class="takeaway">Attention = every position can directly talk to every other position. Only 16% of layers use this (it is computationally expensive), but it provides critical global awareness that the sliding-window layers cannot.</div>
+    `},
+  { id:'pattern', title:'Step 8 — Stacking 32 Layers: The Full Pipeline',
+    text:`
+      <div class="main-text">Evo 2 stacks <b>32 processing layers</b> in a repeating pattern: <span class="hl3">Short</span> &rarr; <span class="hl3">Medium</span> &rarr; <span class="hl3">Long</span> &rarr; <span class="hl">Attention</span>, repeated ~8 times. Each layer also includes a ${J('thinking layer (MLP)','MLP stands for Multi-Layer Perceptron — a small neural network inside each layer that processes information. Think of it as a "thinking step" where the model digests what the pattern detectors found.')} and ${J('residual connections','A shortcut wire that adds the original input back to the output of each layer. This prevents the "telephone game" problem — information does not degrade as it passes through many layers. Like keeping a copy of the original message.')}.</div>
+      <div class="analogy">Think of an assembly line with 32 workstations. First, a worker examines small details (short patterns). Next, another checks medium features. Then one looks at the big picture. Finally, one does a full cross-check (attention). After each station, there is a "thinking step" where findings are processed, plus a "safety copy" of the original is kept so nothing gets lost. This cycle repeats 8 times, building deeper understanding each round.</div>
+      <div class="takeaway">The model processes DNA through 32 layers, alternating between local, medium, long-range pattern detection, and global attention — building progressively deeper understanding at each layer.</div>
+    `},
+  { id:'output', title:'Step 9 — Making the Final Decision',
+    text:`
+      <div class="main-text">After all 32 layers, the model's understanding is ${J('normalized','Normalization adjusts the numbers so they are on a similar scale — preventing any single value from dominating. Like adjusting the volume on different microphones so all speakers sound balanced.')} (balanced), then passed through an ${J('output layer','A simple mathematical transformation that converts the model internal 4,096-number description into 512 scores — one for each possible next token in the dictionary.')} that produces a score for each possible next letter. Finally, ${J('softmax','A mathematical function that converts raw scores into probabilities that add up to 100%. For example, raw scores [2.0, 5.0, 1.0, 0.5] might become [T: 72%, G: 15%, A: 5%, C: 8%]. The highest-scoring letter is the model prediction.')} converts these scores into <b>probabilities</b> — the chance that each letter (A, T, G, or C) comes next.</div>
+      <div class="analogy">Think of a panel of expert judges after watching a performance. Each judge has formed an opinion (the 32 layers of processing). Now they vote: "How likely is it that the next letter is A? T? G? C?" The votes are tallied into percentages. If the judges say 72% T, 15% G, 8% C, 5% A — the model predicts T is most likely next.</div>
+      <div class="takeaway">The final output is simple: a probability for each of the 4 DNA letters. "Given everything before this position, there is a 72% chance the next letter is T."</div>
+    `},
+  { id:'predict', title:'Step 10 — What Can Evo 2 Actually Do?',
+    text:`
+      <div class="main-text">Evo 2 has two main uses:<br><br>
+      <b>1. Scoring sequences</b> — Feed in a DNA sequence and ask "how natural does this look?" The model assigns a ${J('likelihood score','A number representing how probable or "normal" this sequence looks to the model. Natural, functional sequences get high scores. Mutated or broken sequences get low scores.')} to every position. This enables <b>zero-shot variant effect prediction</b>: compare a normal gene vs. a mutated version — if the mutant scores much lower, the mutation is probably harmful.<br><br>
+      <b>2. Generating new DNA</b> — The model predicts the next letter, adds it to the sequence, then predicts the next one, and so on — like autocomplete for DNA. This can design entirely new genes, promoters, or even whole genomes.</div>
+      <div class="analogy">Think of a spell-checker that learned from reading every book ever written. <b>Scoring</b> is like checking if a sentence has errors — "does this DNA look right?" <b>Generating</b> is like autocomplete — "given this beginning, write the next paragraph." Because Evo 2 trained on 8.8 trillion DNA letters from all life on Earth, it has learned the "grammar rules" of genomes.</div>
+      <div class="takeaway">Evo 2 can evaluate mutations (is this change harmful?), design new DNA sequences, and understand genome organization — all without being specifically trained for any of these tasks. It learned them by reading DNA from every domain of life.</div>
+    `},
 ];
 
 // ─── State ───
-let step = -1;     // current step (-1 = splash)
-let t = 0;         // animation time
+let step = -1;
+let t = 0;
 let playing = true;
 let autoAdvance = 0;
 let speedMul = 1;
@@ -155,9 +221,9 @@ function advance() {
   if (step < STEPS.length - 1) { step++; t = 0; autoAdvance = 0; particles.length = 0; updateInfo(); }
 }
 function updateInfo() {
-  if (step < 0) { infoDiv.innerHTML = '<h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to walk through how Evo 2 processes a DNA sequence.</p>'; return; }
+  if (step < 0) { infoDiv.innerHTML = '<h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to walk through how Evo 2 processes a DNA sequence. Each step is explained in plain language with analogies. Hover over <span class="jargon" style="display:inline-flex">blue terms<span class="tip">These pop-up boxes explain technical terms in simple language!</span></span> to see definitions of technical terms.</p>'; return; }
   const s = STEPS[step];
-  infoDiv.innerHTML = `<h2>${s.title}</h2><p>${s.text}</p>`;
+  infoDiv.innerHTML = `<h2>${s.title}</h2>${s.text}`;
 }
 
 // ─── Drawing helpers ───
@@ -172,10 +238,13 @@ function arrow(x1,y1,x2,y2,color,alpha) {
   ctx.restore();
 }
 function txt(str,x,y,color,size,align) {
-  ctx.fillStyle=color||COL.text; ctx.font=(size||13)+'px "Segoe UI",system-ui,sans-serif'; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
+  ctx.fillStyle=color||COL.text; ctx.font=`${size||13}px "Segoe UI",system-ui,sans-serif`; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
+}
+function txtBold(str,x,y,color,size,align) {
+  ctx.fillStyle=color||COL.text; ctx.font=`bold ${size||13}px "Segoe UI",system-ui,sans-serif`; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
 }
 function glow(x,y,r,color,a) {
-  const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,color+''); g.addColorStop(1,'transparent');
+  const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,color); g.addColorStop(1,'transparent');
   ctx.save(); ctx.globalAlpha=a||0.3; ctx.fillStyle=g; ctx.fillRect(x-r,y-r,r*2,r*2); ctx.restore();
 }
 
@@ -187,8 +256,8 @@ function updateParticles() {
   for(let i=particles.length-1;i>=0;i--) {
     const p=particles[i]; p.progress+=p.speed*speedMul;
     if(p.progress>=1) { particles.splice(i,1); continue; }
-    p.x=lerp(p.x,p.tx,p.speed*speedMul*2);
-    p.y=lerp(p.y,p.ty,p.speed*speedMul*2);
+    p.x+=(p.tx-p.x)*p.speed*speedMul*2;
+    p.y+=(p.ty-p.y)*p.speed*speedMul*2;
   }
 }
 function drawParticles() {
@@ -200,21 +269,17 @@ function drawParticles() {
     ctx.restore();
   }
 }
-function lerp(a,b,t){return a+(b-a)*t;}
 
 // ─── DNA helix drawing ───
 function drawHelix(cx,cy,w,h,phase) {
   const n=40;
   ctx.lineWidth=2.5;
-  // strand 1
   ctx.beginPath(); ctx.strokeStyle='#66bb6a';
-  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy+Math.sin(f*Math.PI*4+phase)*h/2; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy+Math.sin(f*Math.PI*4+phase)*h/2; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
   ctx.stroke();
-  // strand 2
   ctx.beginPath(); ctx.strokeStyle='#42a5f5';
-  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy-Math.sin(f*Math.PI*4+phase)*h/2; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy-Math.sin(f*Math.PI*4+phase)*h/2; i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);}
   ctx.stroke();
-  // rungs
   ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,0.12)';
   for(let i=2;i<n;i+=3){const f=i/n; const x=cx-w/2+f*w; const y1=cy+Math.sin(f*Math.PI*4+phase)*h/2; const y2=cy-Math.sin(f*Math.PI*4+phase)*h/2; ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();}
 }
@@ -222,8 +287,9 @@ function drawHelix(cx,cy,w,h,phase) {
 // ─── Nucleotide boxes ───
 const DNA_SEQ = 'ATGCCTAGNNTCGAAATGCGTACGTACGATCGATCG';
 const NUC_COL = {A:'#66bb6a',T:'#42a5f5',G:'#ffa726',C:'#ce93d8',N:'#666'};
+const NUC_NAMES = {A:'Adenine',T:'Thymine',G:'Guanine',C:'Cytosine',N:'Unknown'};
 
-function drawNucBoxes(cx,cy,count,phase,showIds) {
+function drawNucBoxes(cx,cy,count,phase,showIds,showNames) {
   const bw=38,bh=36,gap=4; const total=(bw+gap)*count-gap;
   const sx=cx-total/2;
   for(let i=0;i<count;i++){
@@ -236,6 +302,7 @@ function drawNucBoxes(cx,cy,count,phase,showIds) {
     roundRect(x,y,bw,bh,6,col+'22',col);
     txt(ch,x+bw/2,y+bh/2-(showIds?5:0),col,16);
     if(showIds) txt(''+(i+1),x+bw/2,y+bh/2+12,'#6a7a9a',10);
+    if(showNames && i<5) { txt(NUC_NAMES[ch]||'',x+bw/2,y+bh+14,col+'aa',8); }
     ctx.restore();
   }
   return {x:sx,y:cy,w:total,h:bh};
@@ -250,91 +317,101 @@ function drawEmbedVectors(cx,cy,count,phase) {
     ctx.save(); ctx.globalAlpha=a;
     const x=sx+i*(bw+gap);
     roundRect(x,cy,bw,vh,5,COL.embed+'18',COL.embed+'66');
-    // mini bars inside
     for(let j=0;j<6;j++){
       const bh2=10+Math.sin(i*3+j*1.7+phase*2)*12;
       const bx=x+5+j*5; const by=cy+vh-6-Math.abs(bh2);
       ctx.fillStyle=COL.embed+'88'; ctx.fillRect(bx,by,3.5,Math.abs(bh2));
     }
-    txt('4096d',x+bw/2,cy+vh+12,COL.dim,9);
+    txt('4,096',x+bw/2,cy+vh+10,COL.dim,8);
+    txt('values',x+bw/2,cy+vh+20,COL.dim,8);
     ctx.restore();
   }
 }
 
-// ─── Hyena operator block ───
-function drawHyenaBlock(cx,cy,w,h,label,filterLen,color,phase) {
+// ─── Hyena operator block (simplified labels) ───
+function drawHyenaBlock(cx,cy,w,h,label,sublabel,windowVis,color,phase) {
   const a = Math.min(1, phase * 1.5);
   ctx.save(); ctx.globalAlpha = a;
-
-  // main box
   roundRect(cx-w/2, cy-h/2, w, h, 10, color+'14', color);
-  txt(label, cx, cy-h/2+20, color, 14, 'center');
+  txtBold(label, cx, cy-h/2+22, color, 14);
+  txt(sublabel, cx, cy-h/2+40, COL.dim, 11);
 
-  // internal flow: three projections
-  const pw=50, ph=24, py=cy-10;
-  const labels3 = ['x\u2081 gate','x\u2082 gate','v value'];
-  for(let i=0;i<3;i++){
-    const px = cx-70+i*70;
-    roundRect(px-pw/2, py-ph/2, pw, ph, 5, color+'22', color+'66');
-    txt(labels3[i], px, py, '#c0c8d8', 9);
-  }
+  // Show the sliding window concept
+  const wy = cy + 10;
+  // DNA snippet
+  const snip = 'A T G C C T A G N T C G A A T G C G T A C G';
+  txt(snip, cx, wy, COL.dim, 11);
+  // Sliding window highlight
+  const winX = cx - 60 + Math.sin(phase * 3) * 50;
+  ctx.fillStyle = color + '22';
+  ctx.strokeStyle = color;
+  ctx.lineWidth = 1.5;
+  const winW = windowVis;
+  ctx.beginPath(); ctx.roundRect(winX - winW/2, wy - 12, winW, 24, 4); ctx.fill(); ctx.stroke();
+  txt('window', winX, wy + 22, color, 9);
 
-  // FFT convolution vis
-  const fy=cy+30;
-  txt('FFT Conv (filter ~'+filterLen+')', cx, fy, color, 11);
-  // sine wave representing filter
-  ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=1.8;
-  for(let i=0;i<60;i++){
-    const x=cx-30+i; const y=fy+14+Math.sin(i*0.3+phase*4)*6*Math.exp(-i*0.02);
-    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
-  }
-  ctx.stroke();
-
-  // gating symbols
-  const gy=cy+55;
-  txt('gate \u2297 conv \u2297 gate \u2192 out', cx, gy, COL.dim, 10);
+  // Output arrow
+  arrow(cx, cy + h/2 - 30, cx, cy + h/2 - 14, color, a * 0.6);
+  txt('detected patterns', cx, cy + h/2 - 6, COL.dim, 9);
 
   ctx.restore();
 }
 
-// ─── Attention block ───
+// ─── Attention block (simplified) ───
 function drawAttnBlock(cx,cy,w,h,phase) {
   const a=Math.min(1,phase*1.5);
   ctx.save(); ctx.globalAlpha=a;
   roundRect(cx-w/2,cy-h/2,w,h,10,COL.attn+'14',COL.attn);
-  txt('Multi-Head Attention',cx,cy-h/2+20,COL.attn,14);
+  txtBold('Attention: Every Position Talks to Every Other',cx,cy-h/2+22,COL.attn,13);
+  txt('Each letter asks: "Which other letters in the sequence matter to me?"',cx,cy-h/2+42,COL.dim,10);
 
-  // QKV
-  const qy=cy-5;
-  ['Q','K','V'].forEach((l,i)=>{
-    const px=cx-50+i*50;
-    roundRect(px-18,qy-12,36,24,5,COL.attn+'22',COL.attn+'66');
-    txt(l,px,qy,'#d0c0e8',11);
-  });
+  // Draw simplified attention visualization — nodes with connections
+  const nodeY = cy + 5;
+  const nodeLabels = ['A','T','G','C','C','T','A','G'];
+  const nodeCount = nodeLabels.length;
+  const nodeSpacing = 40;
+  const startX = cx - (nodeCount - 1) * nodeSpacing / 2;
 
-  // attention matrix mini-vis
-  const my=cy+30; const ms=30;
-  ctx.strokeStyle=COL.attn+'44'; ctx.lineWidth=0.8;
-  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
-    const v=Math.sin(r*c+phase*3)*0.5+0.5;
-    ctx.fillStyle=`rgba(206,147,216,${v*0.5})`;
-    ctx.fillRect(cx-ms/2+c*6, my-ms/2+r*6, 5, 5);
+  // Draw connections (attention lines)
+  for(let i = 0; i < nodeCount; i++) {
+    for(let j = 0; j < nodeCount; j++) {
+      if(i === j) continue;
+      const strength = Math.sin(i * j * 0.7 + phase * 2) * 0.5 + 0.5;
+      if(strength > 0.5) {
+        ctx.strokeStyle = COL.attn + Math.floor(strength * 60).toString(16).padStart(2,'0');
+        ctx.lineWidth = strength * 2;
+        ctx.beginPath();
+        ctx.moveTo(startX + i * nodeSpacing, nodeY);
+        ctx.quadraticCurveTo((startX + i * nodeSpacing + startX + j * nodeSpacing) / 2, nodeY - 25 - Math.abs(i-j)*6, startX + j * nodeSpacing, nodeY);
+        ctx.stroke();
+      }
+    }
   }
-  txt('Attn Matrix', cx, my+ms/2+10, COL.dim, 9);
 
-  // RoPE label
-  txt('+ RoPE positional encoding', cx, cy+h/2-14, COL.dim, 9);
+  // Draw nodes
+  for(let i = 0; i < nodeCount; i++) {
+    const x = startX + i * nodeSpacing;
+    const col = NUC_COL[nodeLabels[i]];
+    ctx.fillStyle = '#0d1220';
+    ctx.beginPath(); ctx.arc(x, nodeY, 14, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, nodeY, 14, 0, Math.PI*2); ctx.stroke();
+    txt(nodeLabels[i], x, nodeY, col, 12);
+  }
+
+  // Position encoding note
+  txt('+ Position stamps (so the model knows WHERE each letter is)', cx, cy + h/2 - 16, COL.dim, 9);
 
   ctx.restore();
 }
 
-// ─── MLP block ───
+// ─── MLP block (simplified) ───
 function drawMLPBlock(cx,cy,w,h,phase) {
   const a=Math.min(1,phase*1.5);
   ctx.save(); ctx.globalAlpha=a;
   roundRect(cx-w/2,cy-h/2,w,h,8,COL.mlp+'14',COL.mlp+'66');
-  txt('MLP (GatedLinear + GELU)',cx,cy-6,COL.mlp,11);
-  txt('4096 \u2192 11008 \u2192 4096',cx,cy+10,COL.dim,9);
+  txtBold('Thinking Layer',cx,cy-8,COL.mlp,11);
+  txt('Processes & combines the detected patterns',cx,cy+8,COL.dim,9);
   ctx.restore();
 }
 
@@ -351,18 +428,16 @@ function drawResArrow(x1,y1,x2,y2,phase) {
 
 // ─── Layer stack tower ───
 function drawLayerTower(cx,cy,phase) {
-  const lw=92, lh=16, gap=3;
-  const layers = [];
-  // 32 layers for 7B
+  const lw=100, lh=16, gap=3;
   const layerTypes = [];
   const attnIdx = new Set([3,10,17,24,31]);
   const hclIdx = new Set([2,6,9,13,16,20,23,27,30]);
   const hcmIdx = new Set([1,5,8,12,15,19,22,26,29]);
   for(let i=0;i<32;i++){
-    if(attnIdx.has(i)) layerTypes.push('ATT');
-    else if(hclIdx.has(i)) layerTypes.push('HCL');
-    else if(hcmIdx.has(i)) layerTypes.push('HCS');  // visually labeled
-    else layerTypes.push('HCM');
+    if(attnIdx.has(i)) layerTypes.push('Attention');
+    else if(hclIdx.has(i)) layerTypes.push('Long');
+    else if(hcmIdx.has(i)) layerTypes.push('Short');
+    else layerTypes.push('Medium');
   }
 
   const totalH = 32*(lh+gap);
@@ -371,30 +446,29 @@ function drawLayerTower(cx,cy,phase) {
   for(let i=0;i<32;i++){
     const y = startY + i*(lh+gap);
     const p = Math.max(0, Math.min(1, (phase - i*0.03)*2));
-    if(p<=0)continue;
+    if(p<=0) continue;
     ctx.save(); ctx.globalAlpha=p;
     const tp = layerTypes[i];
     let col = COL.hyena;
-    if(tp==='ATT') col = COL.attn;
-    else if(tp==='HCL') col = '#66bb6a';
-    else if(tp==='HCM') col = '#aed581';
+    if(tp==='Attention') col = COL.attn;
+    else if(tp==='Long') col = '#66bb6a';
+    else if(tp==='Medium') col = '#aed581';
 
     roundRect(cx-lw/2, y, lw, lh, 4, col+'22', col+'88');
-    txt(tp + ' ' + i, cx, y+lh/2, col, 9);
+    txt(tp, cx, y+lh/2, col, 8);
     ctx.restore();
   }
-  // arrows
   const a2 = Math.min(1,phase);
   arrow(cx, startY-15, cx, startY-2, COL.accent, a2*0.5);
   arrow(cx, startY+totalH+2, cx, startY+totalH+15, COL.accent, a2*0.5);
-  txt('input', cx, startY-25, COL.dim, 10);
-  txt('output', cx, startY+totalH+26, COL.dim, 10);
+  txt('DNA in', cx, startY-25, COL.dim, 10);
+  txt('Understanding out', cx, startY+totalH+26, COL.dim, 10);
 }
 
 // ─── Output viz ───
 function drawOutputBar(cx,cy,phase) {
   const nucs=['A','T','G','C'];
-  const probs=[0.05, 0.72, 0.15, 0.08]; // example
+  const probs=[0.05, 0.72, 0.15, 0.08];
   const bw=50, maxH=100, gap=20;
   const total=(bw+gap)*4-gap; const sx=cx-total/2;
   for(let i=0;i<4;i++){
@@ -409,9 +483,13 @@ function drawOutputBar(cx,cy,phase) {
     txt((probs[i]*100).toFixed(0)+'%', x+bw/2, cy-h-14, col, 12);
     ctx.restore();
   }
-  const a3=Math.min(1,phase*0.8);
-  txt('P(next nucleotide | context)', cx, cy+40, COL.dim, 12);
-  if(phase>0.6){ ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.6)*3); glow(sx+1*(bw+gap)+bw/2,cy-probs[1]*maxH*Math.min(1,phase*1.2)-10,40,NUC_COL['T'],0.5); txt('\u2190 Predicted: T','',0,'',0); ctx.restore(); }
+  txt('"What is the next letter most likely to be?"', cx, cy+40, COL.dim, 11);
+  if(phase>0.6){
+    ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.6)*3);
+    glow(sx+1*(bw+gap)+bw/2, cy-probs[1]*maxH*Math.min(1,phase*1.2)-10, 40, NUC_COL['T'], 0.5);
+    txtBold('Most likely: T (72%)', cx, cy+60, COL.accent, 13);
+    ctx.restore();
+  }
 }
 
 // ─── Main draw per step ───
@@ -421,231 +499,263 @@ function drawStep(s, phase) {
   switch(s) {
     case 0: { // DNA input
       drawHelix(cx, topY+80, W*0.75, 60, t*0.8);
-      txt('Raw DNA Sequence', cx, topY+140, COL.dna, 15);
-      drawNucBoxes(cx, topY+170, 12, phase, false);
-      txt('...millions of nucleotides...', cx, topY+220, COL.dim, 12);
-      // arrow down
-      if(phase>0.5) arrow(cx, topY+240, cx, topY+270, COL.accent, (phase-0.5)*2);
+      txtBold('DNA Double Helix', cx, topY+130, COL.dna, 14);
+      txt('The model reads one strand as a sequence of letters:', cx, topY+150, COL.dim, 11);
+      drawNucBoxes(cx, topY+175, 12, phase, false, true);
+      txt('...this can be millions of letters long...', cx, topY+235, COL.dim, 11);
+      if(phase>0.5) arrow(cx, topY+250, cx, topY+275, COL.accent, (phase-0.5)*2);
+      if(phase>0.7) txt('Just 4 letters encode all life on Earth', cx, topY+290, COL.accent, 12);
       break;
     }
     case 1: { // Tokenize
-      drawNucBoxes(cx, topY+40, 10, phase, false);
-      if(phase>0.3) arrow(cx, topY+90, cx, topY+120, COL.accent, (phase-0.3)*2);
-      // token IDs
+      txt('Each letter gets a number (its "token ID"):', cx, topY+20, COL.dim, 12);
+      drawNucBoxes(cx, topY+50, 10, phase, false);
+      if(phase>0.3) {
+        // arrows between
+        for(let i=0;i<10;i++){
+          const a=Math.max(0,Math.min(1,(phase-0.3-i*0.03)*3));
+          if(a<=0) continue;
+          const bw2=38,gap2=4; const total2=(bw2+gap2)*10-gap2; const sx2=cx-total2/2;
+          const xm=sx2+i*(bw2+gap2)+bw2/2;
+          arrow(xm, topY+90, xm, topY+115, COL.accent, a*0.5);
+        }
+      }
       if(phase>0.4) {
         const ids=[1,4,3,2,2,4,1,3,14,14];
+        const labels=['A=1','T=4','G=3','C=2','C=2','T=4','A=1','G=3','N=14','N=14'];
         const bw=38,gap=4,count=10; const total=(bw+gap)*count-gap; const sx=cx-total/2;
         for(let i=0;i<count;i++){
           const a=Math.max(0,Math.min(1,(phase-0.4-i*0.05)*3));
           if(a<=0) continue;
           ctx.save(); ctx.globalAlpha=a;
           const x=sx+i*(bw+gap);
-          roundRect(x,topY+140,bw,36,6,COL.token+'22',COL.token);
-          txt(''+ids[i],x+bw/2,topY+158,COL.token,15);
+          roundRect(x,topY+120,bw,36,6,COL.token+'22',COL.token);
+          txt(''+ids[i],x+bw/2,topY+138,COL.token,15);
           ctx.restore();
         }
       }
       if(phase>0.7) {
-        txt('Vocabulary: 512 tokens | 1 nucleotide = 1 token', cx, topY+200, COL.dim, 12);
-        txt('CharLevelTokenizer — zero information loss', cx, topY+220, COL.accent, 11);
+        roundRect(cx-200, topY+180, 400, 60, 8, '#111828', '#1e2a44');
+        txt('Why numbers? Computers can only do math with numbers,', cx, topY+198, COL.dim, 11);
+        txt('not letters. So we convert first, then compute.', cx, topY+214, COL.dim, 11);
+        txt('Dictionary size: 512 possible tokens', cx, topY+234, COL.accent, 10);
       }
       break;
     }
     case 2: { // Embedding
-      // token IDs (small)
+      txt('Simple numbers are not enough. Each gets a "profile card":', cx, topY+16, COL.dim, 12);
       const ids=[1,4,3,2,2,4,1,3];
       const bw=30,gap=3,count=8; const total=(bw+gap)*count-gap; const sx=cx-total/2;
       for(let i=0;i<count;i++){
         ctx.save(); ctx.globalAlpha=0.6;
         const x=sx+i*(bw+gap);
-        roundRect(x,topY+20,bw,28,5,COL.token+'18',COL.token+'66');
-        txt(''+ids[i],x+bw/2,topY+34,COL.token,11);
+        roundRect(x,topY+35,bw,28,5,COL.token+'18',COL.token+'66');
+        txt(''+ids[i],x+bw/2,topY+49,COL.token,11);
         ctx.restore();
       }
-      if(phase>0.2) arrow(cx, topY+60, cx, topY+85, COL.accent, Math.min(1,(phase-0.2)*3));
-      // embedding vectors
-      if(phase>0.3) drawEmbedVectors(cx, topY+100, 8, phase-0.3);
+      if(phase>0.2) {
+        for(let i=0;i<count;i++){
+          const a=Math.max(0,Math.min(1,(phase-0.2-i*0.05)*3));
+          if(a<=0) continue;
+          const x=sx+i*(bw+gap)+bw/2;
+          arrow(x, topY+65, x, topY+88, COL.accent, a*0.4);
+        }
+      }
+      if(phase>0.3) drawEmbedVectors(cx, topY+95, 8, phase-0.3);
       if(phase>0.6) {
-        txt('Embedding lookup table: 512 \u2192 4096-dim dense vectors', cx, topY+210, COL.dim, 12);
-        txt('[batch, seq_len, 4096]', cx, topY+230, COL.embed, 12);
+        roundRect(cx-220, topY+210, 440, 70, 8, '#111828', '#1e2a44');
+        txt('Each number becomes a list of 4,096 values', cx, topY+228, COL.embed, 12);
+        txt('Think of it as: "1" (just a number) becomes a detailed', cx, topY+248, COL.dim, 10);
+        txt('character sheet with 4,096 traits the model can reason about', cx, topY+264, COL.dim, 10);
       }
       break;
     }
     case 3: { // HCS
-      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Short Conv (HCS)', '7 bp', COL.hyena, phase);
-      if(phase>0.2) { txt('Captures: dinucleotides, codon boundaries, tiny motifs', cx, topY+280, COL.dim, 11); }
-      if(phase>0.5) {
-        // show short filter wave
-        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
-        txt('Short receptive field (~7 bp)', cx, topY+310, COL.hyena, 12);
-        // draw short bar
-        const bx=cx-3.5*12; for(let i=0;i<7;i++){
-          ctx.fillStyle=COL.hyena+'66'; roundRect(bx+i*12, topY+330, 10, 20, 3, COL.hyena+'33', COL.hyena);
-        }
-        ctx.restore();
+      drawHyenaBlock(cx, topY+170, 380, 140, 'Short-Range Pattern Detector', 'Slides a tiny window (~7 letters) across the DNA', 50, COL.hyena, phase);
+      if(phase>0.3) {
+        roundRect(cx-200, topY+280, 400, 80, 8, '#111828', COL.hyena+'33');
+        txtBold('What does it find?', cx, topY+298, COL.hyena, 12);
+        txt('Codons (3-letter codes): ATG = "start making protein"', cx, topY+316, COL.dim, 10);
+        txt('Dinucleotides (2-letter pairs): CG = often a regulatory signal', cx, topY+334, COL.dim, 10);
+        txt('Think: checking individual words in a sentence', cx, topY+352, COL.dim+'cc', 9);
       }
       break;
     }
     case 4: { // HCM
-      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Medium Conv (HCM)', '~128 bp', '#aed581', phase);
-      if(phase>0.2) txt('Captures: promoters, RBS, TATA boxes, regulatory regions', cx, topY+280, COL.dim, 11);
-      if(phase>0.5) {
-        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
-        txt('Medium receptive field (~128 bp)', cx, topY+310, '#aed581', 12);
-        const bx=cx-20*5; for(let i=0;i<40;i++){
-          ctx.fillStyle='#aed581'+'44';
-          ctx.fillRect(bx+i*5, topY+330, 4, 16);
-        }
-        ctx.restore();
+      drawHyenaBlock(cx, topY+170, 380, 140, 'Medium-Range Pattern Detector', 'Slides a wider window (~128 letters) across the DNA', 120, '#aed581', phase);
+      if(phase>0.3) {
+        roundRect(cx-200, topY+280, 400, 80, 8, '#111828', '#aed581'+'33');
+        txtBold('What does it find?', cx, topY+298, '#aed581', 12);
+        txt('Promoters: "start reading this gene here" signals (~100 bp)', cx, topY+316, COL.dim, 10);
+        txt('Ribosome binding sites, TATA boxes, regulatory regions', cx, topY+334, COL.dim, 10);
+        txt('Think: checking whole sentences and paragraphs', cx, topY+352, COL.dim+'cc', 9);
       }
       break;
     }
     case 5: { // HCL
-      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Long Conv (HCL)', 'full seq (1M bp)', '#66bb6a', phase);
-      if(phase>0.2) txt('Captures: operons, gene neighborhoods, chromosome-scale patterns', cx, topY+280, COL.dim, 11);
-      if(phase>0.5) {
-        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
-        txt('Full-length receptive field (up to 1,000,000 bp)', cx, topY+310, '#66bb6a', 12);
-        // long bar
-        ctx.fillStyle='#66bb6a22';
-        roundRect(cx-W*0.38, topY+328, W*0.76, 18, 4, '#66bb6a22', '#66bb6a88');
-        txt('FFT-based O(L log L) — not O(L\u00B2)', cx, topY+360, '#66bb6a', 11);
-        ctx.restore();
+      drawHyenaBlock(cx, topY+170, 380, 140, 'Long-Range Pattern Detector', 'Looks at the ENTIRE sequence at once (up to 1,000,000 letters!)', 200, '#66bb6a', phase);
+      if(phase>0.3) {
+        roundRect(cx-220, topY+280, 440, 100, 8, '#111828', '#66bb6a33');
+        txtBold('What does it find?', cx, topY+298, '#66bb6a', 12);
+        txt('How genes thousands of letters apart relate to each other', cx, topY+316, COL.dim, 10);
+        txt('Operons (groups of genes that work together)', cx, topY+334, COL.dim, 10);
+        txt('Chromosome-scale organizational patterns', cx, topY+352, COL.dim, 10);
+        txt('Think: understanding how chapters of a book connect', cx, topY+370, COL.dim+'cc', 9);
       }
       break;
     }
     case 6: { // Attention
-      drawAttnBlock(cx, topY+160, 340, 170, phase);
+      drawAttnBlock(cx, topY+170, 420, 160, phase);
       if(phase>0.3) {
-        txt('Only ~16% of layers (5/32) use attention', cx, topY+290, COL.dim, 11);
-        txt('Grouped-Query Attention + RoPE + Flash Attention v2', cx, topY+310, COL.attn, 11);
-      }
-      if(phase>0.6) {
-        txt('Provides exact global pairwise interactions', cx, topY+340, COL.dim, 11);
+        roundRect(cx-220, topY+290, 440, 80, 8, '#111828', COL.attn+'33');
+        txtBold('Why is this different from the pattern detectors?', cx, topY+308, COL.attn, 11);
+        txt('Pattern detectors slide a window (local view). Attention lets', cx, topY+326, COL.dim, 10);
+        txt('EVERY letter look at EVERY other letter directly (global view).', cx, topY+344, COL.dim, 10);
+        txt('Only ~16% of layers use this (5 of 32) because it is expensive', cx, topY+362, COL.dim+'cc', 9);
       }
       break;
     }
     case 7: { // Pattern - layer tower
-      // Draw the tower on left
-      drawLayerTower(cx-260, topY+320, phase);
+      drawLayerTower(cx-250, topY+320, phase);
 
-      // Draw the pattern explanation on right
-      const rx=cx+100, ry=topY+80;
+      const rx=cx+110, ry=topY+60;
+      txtBold('The Assembly Line: 32 Layers', rx, ry, COL.accent, 14);
+      txt('Data flows through this repeating cycle:', rx, ry+20, COL.dim, 11);
+
       const pattern = [
-        {label:'HCS (short conv)',  col:COL.hyena},
-        {label:'HCM (medium conv)', col:'#aed581'},
-        {label:'HCL (long conv)',   col:'#66bb6a'},
-        {label:'Attention',         col:COL.attn},
+        {label:'Short patterns (~7 letters)',   col:COL.hyena,  icon:'nearby words'},
+        {label:'Medium patterns (~128 letters)', col:'#aed581', icon:'sentences'},
+        {label:'Long patterns (entire sequence)',col:'#66bb6a', icon:'whole chapters'},
+        {label:'Attention (global cross-check)', col:COL.attn,  icon:'all pages at once'},
       ];
-      txt('Repeating Motif:', rx, ry, COL.accent, 14);
       for(let i=0;i<4;i++){
-        const a=Math.max(0,Math.min(1,(phase-i*0.15)*2));
+        const a=Math.max(0,Math.min(1,(phase-i*0.12)*2));
         if(a<=0) continue;
         ctx.save(); ctx.globalAlpha=a;
-        const y=ry+30+i*50;
-        roundRect(rx-90,y-16,180,32,6,pattern[i].col+'18',pattern[i].col);
-        txt(pattern[i].label,rx,y,pattern[i].col,12);
-        if(i<3) arrow(rx, y+18, rx, y+30, COL.accent, a*0.5);
+        const y=ry+50+i*55;
+        roundRect(rx-130,y-16,260,32,6,pattern[i].col+'18',pattern[i].col);
+        txt(pattern[i].label,rx,y-2,pattern[i].col,10);
+        txt(pattern[i].icon,rx,y+12,COL.dim,8);
+        if(i<3) arrow(rx, y+18, rx, y+32, COL.accent, a*0.4);
         ctx.restore();
       }
 
-      // MLP + Residual note
       if(phase>0.5) {
-        const ny=ry+250;
-        drawMLPBlock(rx, ny, 180, 40, phase-0.5);
-        if(phase>0.6) drawResArrow(rx+100, ry+30, rx+100, ry+230, phase-0.6);
-        if(phase>0.7) txt('Each layer: Mixer + MLP + Residuals', rx, ny+40, COL.dim, 10);
+        const ny=ry+285;
+        drawMLPBlock(rx, ny, 200, 44, phase-0.5);
+        if(phase>0.55) {
+          drawResArrow(rx+140, ry+50, rx+140, ry+270, phase-0.55);
+          txt('Shortcut', rx+158, ry+160, COL.res, 8);
+          txt('(preserves', rx+158, ry+172, COL.res, 7);
+          txt('original info)', rx+158, ry+184, COL.res, 7);
+        }
       }
 
-      // Multi-scale label
-      if(phase>0.8) {
-        txt('Multi-scale hierarchy:', rx, ry+320, COL.accent, 12);
-        txt('local \u2192 medium \u2192 global \u2192 exact pairwise', rx, ry+340, COL.dim, 11);
+      if(phase>0.7) {
+        const by = ry+340;
+        roundRect(rx-130, by, 260, 50, 8, '#111828', '#1e2a44');
+        txt('This cycle repeats ~8 times = 32 layers total', rx, by+16, COL.accent, 10);
+        txt('Each pass builds deeper understanding of the DNA', rx, by+34, COL.dim, 9);
       }
       break;
     }
     case 8: { // Output
-      // small layer stack
-      txt('32 layers processed...', cx, topY+30, COL.dim, 12);
-      if(phase>0.1){
-        roundRect(cx-80,topY+45,160,30,6,COL.accent+'14',COL.accent+'44');
-        txt('Final RMSNorm', cx, topY+60, COL.accent, 12);
+      txt('After 32 layers of processing...', cx, topY+20, COL.dim, 12);
+      if(phase>0.05){
+        roundRect(cx-100,topY+40,200,35,6,COL.accent+'14',COL.accent+'44');
+        txtBold('Step A: Balance the values', cx, topY+50, COL.accent, 11);
+        txt('(normalization)', cx, topY+66, COL.dim, 9);
       }
-      if(phase>0.3) arrow(cx, topY+80, cx, topY+105, COL.accent, Math.min(1,(phase-0.3)*3));
-      if(phase>0.4){
-        roundRect(cx-100,topY+110,200,35,6,COL.output+'14',COL.output+'66');
-        txt('Output Projection: 4096 \u2192 512', cx, topY+128, COL.output, 12);
+      if(phase>0.2) arrow(cx, topY+80, cx, topY+100, COL.accent, Math.min(1,(phase-0.2)*3));
+      if(phase>0.25){
+        roundRect(cx-120,topY+105,240,35,6,COL.output+'14',COL.output+'66');
+        txtBold('Step B: Convert to 4 scores', cx, topY+115, COL.output, 11);
+        txt('(one score per possible letter: A, T, G, C)', cx, topY+131, COL.dim, 9);
       }
-      if(phase>0.55) arrow(cx, topY+150, cx, topY+175, COL.accent, Math.min(1,(phase-0.55)*3));
-      if(phase>0.6){
-        roundRect(cx-60,topY+180,120,30,6,'#fff1','#fff3');
-        txt('Softmax', cx, topY+195, '#fff', 12);
+      if(phase>0.4) arrow(cx, topY+145, cx, topY+165, COL.accent, Math.min(1,(phase-0.4)*3));
+      if(phase>0.45){
+        roundRect(cx-110,topY+170,220,40,6,'#1a2040','#fff3');
+        txtBold('Step C: Convert scores to %', cx, topY+182, '#fff', 11);
+        txt('(softmax: makes scores add up to 100%)', cx, topY+200, COL.dim, 9);
       }
-      if(phase>0.7) arrow(cx, topY+215, cx, topY+245, COL.accent, Math.min(1,(phase-0.7)*3));
-      if(phase>0.75) drawOutputBar(cx, topY+380, phase-0.75);
+      if(phase>0.6) arrow(cx, topY+215, cx, topY+240, COL.accent, Math.min(1,(phase-0.6)*3));
+      if(phase>0.65) drawOutputBar(cx, topY+380, phase-0.65);
       break;
     }
     case 9: { // Predict & generate
-      // scoring path
-      const ly=topY+40;
-      txt('Two modes of operation:', cx, ly, COL.accent, 15);
+      const ly=topY+30;
+      txtBold('Two things Evo 2 can do:', cx, ly, COL.accent, 16);
 
       // Left: Scoring
       const lx=cx-180;
       if(phase>0.1) {
-        roundRect(lx-110,ly+30,220,200,10,'#1a2a3a',COL.accent+'44');
-        txt('Scoring / Evaluation', lx, ly+50, COL.accent, 13);
-        if(phase>0.2) txt('Feed sequence \u2192 get log-likelihood', lx, ly+80, COL.dim, 10);
-        if(phase>0.3) txt('Zero-shot variant effect prediction:', lx, ly+110, COL.text, 10);
-        if(phase>0.4) {
-          txt('WT: ATGCCTAG  \u2192 LL = -2.1', lx, ly+135, COL.hyena, 10);
-          txt('Mut: ATGCCAAG  \u2192 LL = -4.7', lx, ly+155, COL.res, 10);
-          txt('\u0394LL = -2.6 \u2192 Deleterious!', lx, ly+180, COL.output, 10);
+        roundRect(lx-120,ly+25,240,220,10,'#0f1828',COL.accent+'44');
+        txtBold('1. Check if DNA is "correct"', lx, ly+48, COL.accent, 12);
+        if(phase>0.2) {
+          txt('Feed in a DNA sequence and ask:', lx, ly+75, COL.dim, 10);
+          txt('"Does this look like real, functional DNA?"', lx, ly+92, '#b8c4d8', 10);
+        }
+        if(phase>0.35) {
+          txt('Example: Is this mutation harmful?', lx, ly+120, COL.text, 10);
+          roundRect(lx-90,ly+132,180,20,4,COL.hyena+'11',COL.hyena+'44');
+          txt('Normal: ATGCCTAG   Score: 95%', lx, ly+142, COL.hyena, 9);
+          roundRect(lx-90,ly+156,180,20,4,COL.res+'11',COL.res+'44');
+          txt('Mutant: ATGCCAAG   Score: 31%', lx, ly+166, COL.res, 9);
+          if(phase>0.45) {
+            txtBold('Much lower score = probably harmful!', lx, ly+195, COL.output, 10);
+            txt('(No lab experiment needed)', lx, ly+212, COL.dim, 9);
+          }
         }
       }
 
       // Right: Generation
       const rx2=cx+180;
       if(phase>0.2) {
-        roundRect(rx2-110,ly+30,220,200,10,'#1a2a3a',COL.hyena+'44');
-        txt('Autoregressive Generation', rx2, ly+50, COL.hyena, 13);
-        if(phase>0.3) txt('Sample next nucleotide \u2192 append \u2192 repeat', rx2, ly+80, COL.dim, 10);
+        roundRect(rx2-120,ly+25,240,220,10,'#0f1828',COL.hyena+'44');
+        txtBold('2. Write new DNA', rx2, ly+48, COL.hyena, 12);
+        if(phase>0.3) {
+          txt('Like autocomplete on your phone,', rx2, ly+75, COL.dim, 10);
+          txt('but for DNA sequences:', rx2, ly+92, COL.dim, 10);
+        }
         if(phase>0.4) {
-          // show growing sequence
           const seq='ATGCCTAG';
           const generated='GCTA';
-          const py2=ly+110;
+          const py2=ly+115;
+          txt('Given:', rx2-70, py2-2, COL.dim, 9, 'left');
           for(let i=0;i<seq.length;i++){
             const ch=seq[i]; const col=NUC_COL[ch];
             ctx.save(); ctx.globalAlpha=0.5;
-            roundRect(rx2-90+i*22, py2, 20, 22, 3, col+'22', col+'66');
-            txt(ch, rx2-90+i*22+10, py2+11, col, 10);
+            roundRect(rx2-40+i*22, py2-10, 20, 22, 3, col+'22', col+'66');
+            txt(ch, rx2-40+i*22+10, py2+1, col, 10);
             ctx.restore();
           }
+          txt('Generates:', rx2-58, py2+22, COL.dim, 9, 'left');
           for(let i=0;i<generated.length;i++){
             const a=Math.max(0,Math.min(1,(phase-0.5-i*0.1)*3));
             if(a<=0)continue;
             const ch=generated[i]; const col=NUC_COL[ch];
             ctx.save(); ctx.globalAlpha=a;
-            roundRect(rx2-90+(seq.length+i)*22, py2, 20, 22, 3, col+'44', col);
-            txt(ch, rx2-90+(seq.length+i)*22+10, py2+11, col, 11);
-            glow(rx2-90+(seq.length+i)*22+10, py2+11, 15, col, 0.4);
+            roundRect(rx2-40+(seq.length+i)*22, py2-10, 20, 22, 3, col+'44', col);
+            txt(ch, rx2-40+(seq.length+i)*22+10, py2+1, col, 11);
+            glow(rx2-40+(seq.length+i)*22+10, py2+1, 15, col, 0.4);
             ctx.restore();
           }
         }
         if(phase>0.6) {
-          txt('Hyena layers: O(1) memory per step', rx2, ly+160, COL.hyena, 10);
-          txt('(state-space model equivalence)', rx2, ly+178, COL.dim, 9);
-          txt('Attention layers: KV cache (only 16%)', rx2, ly+198, COL.attn, 10);
+          txt('Can design entirely new:', rx2, ly+165, '#b8c4d8', 10);
+          txt('Genes, promoters, regulatory', rx2, ly+182, COL.dim, 10);
+          txt('elements, even whole genomes', rx2, ly+198, COL.dim, 10);
+          txt('(like AI art, but for biology)', rx2, ly+218, COL.dim+'cc', 9);
         }
       }
 
       // Bottom summary
       if(phase>0.7) {
         const by=ly+260;
-        roundRect(cx-220,by,440,60,10,'#111828','#243050');
-        txt('Evo 2: The largest genomic foundation model', cx, by+18, COL.accent, 13);
-        txt('8.8T tokens \u00B7 40B params \u00B7 1M context \u00B7 All domains of life', cx, by+40, COL.dim, 11);
+        roundRect(cx-240,by,480,65,10,'#111828','#243050');
+        txtBold('Evo 2 = a spell-checker + autocomplete for DNA', cx, by+16, COL.accent, 13);
+        txt('Trained on 8.8 TRILLION DNA letters from bacteria, viruses,', cx, by+36, COL.dim, 10);
+        txt('plants, animals, fungi — essentially all known life on Earth', cx, by+52, COL.dim, 10);
       }
       break;
     }
@@ -671,24 +781,21 @@ function drawProgress() {
     ctx.fillStyle = i===step ? COL.accent : (i<step ? COL.accent+'44' : '#1e2a44');
     ctx.beginPath(); ctx.arc(x+pw/2,y,pw/2,0,Math.PI*2); ctx.fill();
   }
-  if(step>=0) txt(`${step+1}/${STEPS.length}`, W/2, H-36, COL.dim, 10);
+  if(step>=0) txt(`${step+1} of ${STEPS.length}`, W/2, H-36, COL.dim, 10);
 }
 
 // ─── Main loop ───
 function draw() {
   drawBG();
-
   if(step >= 0) {
     const phase = Math.min(t * 0.012 * speedMul, 1.5);
     drawStep(step, phase);
   } else {
-    // Splash
     drawHelix(W/2, H/2-60, W*0.6, 80, t*0.6);
-    txt('Evo 2', W/2, H/2+30, COL.accent, 28);
-    txt('Genomic Foundation Model', W/2, H/2+58, COL.dim, 14);
-    txt('Press Play or Next to begin', W/2, H/2+90, COL.dim+'88', 12);
+    txtBold('Evo 2', W/2, H/2+30, COL.accent, 28);
+    txt('A Deep Learning Model That Reads DNA', W/2, H/2+55, COL.dim, 14);
+    txt('Press Play or Next to begin the walkthrough', W/2, H/2+80, COL.dim+'88', 12);
   }
-
   drawProgress();
   updateParticles();
   drawParticles();
@@ -700,7 +807,7 @@ function loop(ts) {
   if(playing || step>=0) t += dt * 0.016 * speedMul;
   if(playing && step>=0) {
     autoAdvance += dt * 0.001 * speedMul;
-    if(autoAdvance > 8 && step < STEPS.length-1) advance();
+    if(autoAdvance > 10 && step < STEPS.length-1) advance();
   }
   draw();
   requestAnimationFrame(loop);
