@@ -9,15 +9,7 @@
   body { background:#0a0e1a; color:#e0e6f0; font-family:'Segoe UI',system-ui,sans-serif; overflow-x:hidden; }
 
   /* ── Sticky header wrapper ── */
-  .sticky-header { position:sticky; top:0; z-index:100; background:#0a0e1a; border-bottom:1px solid #1a2240;
-    will-change:transform; transform:translateZ(0); -webkit-backface-visibility:hidden; backface-visibility:hidden; }
-  .sticky-header.compact header { padding:6px 20px 2px; }
-  .sticky-header.compact header h1 { font-size:1.1rem; }
-  .sticky-header.compact header p { max-height:0; overflow:hidden; opacity:0; margin:0; padding:0; }
-  .sticky-header.compact #controls { padding:3px 16px; gap:6px; }
-  .sticky-header.compact #controls button { padding:4px 10px; font-size:.75rem; }
-  .sticky-header.compact #legend { padding:2px 12px; font-size:.7rem; gap:12px; }
-  .sticky-header.compact #legend .leg span { width:10px; height:10px; }
+  .sticky-header { position:sticky; top:0; z-index:100; background:#0a0e1a; border-bottom:1px solid #1a2240; }
 
   /* ── Top bar ── */
   header { text-align:center; padding:14px 20px 4px; }
@@ -65,7 +57,6 @@
   /* ── Back link ── */
   .back-link { position:absolute; top:10px; left:20px; color:#4fc3f7; text-decoration:none; font-size:.85rem; z-index:10; }
   .back-link:hover { text-decoration:underline; }
-  .sticky-header.compact .back-link { top:6px; font-size:.78rem; }
 </style>
 </head>
 <body>
@@ -811,17 +802,6 @@ function loop(ts) {
 }
 requestAnimationFrame(loop);
 
-// ─── Sticky header: compact on scroll ───
-const stickyHeader = document.getElementById('stickyHeader');
-let lastScrollCompact = false;
-window.addEventListener('scroll', () => {
-  const shouldCompact = window.scrollY > 60;
-  if (shouldCompact !== lastScrollCompact) {
-    lastScrollCompact = shouldCompact;
-    if (shouldCompact) stickyHeader.classList.add('compact');
-    else stickyHeader.classList.remove('compact');
-  }
-}, { passive: true });
 </script>
 </body>
 </html>
