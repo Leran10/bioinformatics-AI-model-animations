@@ -9,45 +9,45 @@
   body { background:#0a0e1a; color:#e0e6f0; font-family:'Segoe UI',system-ui,sans-serif; overflow-x:hidden; }
 
   /* ── Top bar ── */
-  header { text-align:center; padding:30px 20px 10px; }
-  header h1 { font-size:2.2rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
+  header { text-align:center; padding:14px 20px 4px; }
+  header h1 { font-size:1.6rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  header p { color:#8892a8; margin-top:6px; font-size:0.95rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.5; }
+  header p { color:#8892a8; margin-top:4px; font-size:0.85rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.4; }
 
   /* ── Controls ── */
-  #controls { display:flex; justify-content:center; gap:14px; padding:16px; flex-wrap:wrap; }
-  button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:9px 22px; border-radius:8px; cursor:pointer; font-size:.9rem; transition:.2s; font-family:inherit; }
+  #controls { display:flex; justify-content:center; gap:10px; padding:6px 16px; flex-wrap:wrap; }
+  button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:6px 16px; border-radius:8px; cursor:pointer; font-size:.82rem; transition:.2s; font-family:inherit; }
   button:hover { background:#24304e; border-color:#4fc3f7; color:#fff; }
   button.active { background:#1b2d4d; border-color:#4fc3f7; color:#4fc3f7; }
-  #speed-label { color:#6b7a96; font-size:.85rem; align-self:center; }
+  #speed-label { color:#6b7a96; font-size:.8rem; align-self:center; }
 
   /* ── Stage ── */
-  #stage { position:relative; width:100%; max-width:1100px; margin:0 auto; padding:20px; }
+  #stage { position:relative; width:100%; max-width:1100px; margin:0 auto; padding:4px 20px; }
   canvas { display:block; margin:0 auto; border-radius:12px; }
 
   /* ── Info panel ── */
-  #info { max-width:900px; margin:20px auto; padding:24px 30px; background:#111828; border:1px solid #1e2a44; border-radius:12px; min-height:100px; transition:opacity .4s; }
-  #info h2 { font-size:1.15rem; color:#4fc3f7; margin-bottom:8px; }
-  #info p, #info .main-text { line-height:1.7; font-size:.95rem; color:#b8c4d8; }
+  #info { max-width:900px; margin:4px auto 10px; padding:16px 24px; background:#111828; border:1px solid #1e2a44; border-radius:12px; min-height:60px; transition:opacity .4s; }
+  #info h2 { font-size:1.05rem; color:#4fc3f7; margin-bottom:5px; }
+  #info p, #info .main-text { line-height:1.55; font-size:.88rem; color:#b8c4d8; }
   .hl { color:#ce93d8; font-weight:600; }
   .hl2 { color:#4fc3f7; font-weight:600; }
   .hl3 { color:#81c784; font-weight:600; }
 
   /* ── Analogy box ── */
-  .analogy { background:#0f1a2e; border-left:3px solid #ffa726; border-radius:0 8px 8px 0; padding:12px 16px; margin:12px 0; font-size:.9rem; color:#d4c8a8; }
+  .analogy { background:#0f1a2e; border-left:3px solid #ffa726; border-radius:0 8px 8px 0; padding:8px 14px; margin:6px 0; font-size:.84rem; color:#d4c8a8; }
   .analogy::before { content:'Analogy: '; font-weight:700; color:#ffa726; }
 
   /* ── Jargon buster ── */
-  .jargon { display:inline-flex; align-items:center; gap:4px; background:#4fc3f70e; border:1px solid #4fc3f733; border-radius:6px; padding:2px 8px; font-size:.82rem; color:#4fc3f7; cursor:help; position:relative; }
-  .jargon .tip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:#1a2848; border:1px solid #2e4a6e; border-radius:8px; padding:10px 14px; font-size:.82rem; color:#b0c4de; width:280px; z-index:10; line-height:1.5; box-shadow:0 4px 20px #0008; text-align:left; }
+  .jargon { display:inline-flex; align-items:center; gap:4px; background:#4fc3f70e; border:1px solid #4fc3f733; border-radius:6px; padding:2px 8px; font-size:.8rem; color:#4fc3f7; cursor:help; position:relative; }
+  .jargon .tip { display:none; position:absolute; bottom:calc(100% + 8px); left:50%; transform:translateX(-50%); background:#1a2848; border:1px solid #2e4a6e; border-radius:8px; padding:10px 14px; font-size:.8rem; color:#b0c4de; width:280px; z-index:10; line-height:1.5; box-shadow:0 4px 20px #0008; text-align:left; }
   .jargon:hover .tip { display:block; }
 
   /* ── Key takeaway ── */
-  .takeaway { background:#81c78412; border:1px solid #81c78433; border-radius:8px; padding:10px 14px; margin:10px 0; font-size:.88rem; color:#a8d8a0; }
+  .takeaway { background:#81c78412; border:1px solid #81c78433; border-radius:8px; padding:7px 12px; margin:6px 0; font-size:.84rem; color:#a8d8a0; }
   .takeaway::before { content:'Key idea: '; font-weight:700; color:#81c784; }
 
   /* ── Legend ── */
-  #legend { display:flex; justify-content:center; gap:24px; padding:12px; flex-wrap:wrap; font-size:.82rem; }
+  #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; }
   .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
   .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; }
 
@@ -96,7 +96,7 @@ const DPR = window.devicePixelRatio || 1;
 let W, H;
 function resize() {
   W = Math.min(1060, window.innerWidth - 40);
-  H = 720;
+  H = 480;
   canvas.width = W * DPR; canvas.height = H * DPR;
   canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
@@ -333,26 +333,20 @@ function drawHyenaBlock(cx,cy,w,h,label,sublabel,windowVis,color,phase) {
   const a = Math.min(1, phase * 1.5);
   ctx.save(); ctx.globalAlpha = a;
   roundRect(cx-w/2, cy-h/2, w, h, 10, color+'14', color);
-  txtBold(label, cx, cy-h/2+22, color, 14);
-  txt(sublabel, cx, cy-h/2+40, COL.dim, 11);
+  txtBold(label, cx, cy-h/2+18, color, 13);
+  txt(sublabel, cx, cy-h/2+34, COL.dim, 10);
 
-  // Show the sliding window concept
-  const wy = cy + 10;
-  // DNA snippet
+  const wy = cy + 5;
   const snip = 'A T G C C T A G N T C G A A T G C G T A C G';
-  txt(snip, cx, wy, COL.dim, 11);
-  // Sliding window highlight
+  txt(snip, cx, wy, COL.dim, 10);
   const winX = cx - 60 + Math.sin(phase * 3) * 50;
-  ctx.fillStyle = color + '22';
-  ctx.strokeStyle = color;
-  ctx.lineWidth = 1.5;
+  ctx.fillStyle = color + '22'; ctx.strokeStyle = color; ctx.lineWidth = 1.5;
   const winW = windowVis;
-  ctx.beginPath(); ctx.roundRect(winX - winW/2, wy - 12, winW, 24, 4); ctx.fill(); ctx.stroke();
-  txt('window', winX, wy + 22, color, 9);
+  ctx.beginPath(); ctx.roundRect(winX - winW/2, wy - 10, winW, 20, 4); ctx.fill(); ctx.stroke();
+  txt('window', winX, wy + 18, color, 8);
 
-  // Output arrow
-  arrow(cx, cy + h/2 - 30, cx, cy + h/2 - 14, color, a * 0.6);
-  txt('detected patterns', cx, cy + h/2 - 6, COL.dim, 9);
+  arrow(cx, cy + h/2 - 22, cx, cy + h/2 - 10, color, a * 0.6);
+  txt('detected patterns', cx, cy + h/2 - 3, COL.dim, 8);
 
   ctx.restore();
 }
@@ -362,17 +356,15 @@ function drawAttnBlock(cx,cy,w,h,phase) {
   const a=Math.min(1,phase*1.5);
   ctx.save(); ctx.globalAlpha=a;
   roundRect(cx-w/2,cy-h/2,w,h,10,COL.attn+'14',COL.attn);
-  txtBold('Attention: Every Position Talks to Every Other',cx,cy-h/2+22,COL.attn,13);
-  txt('Each letter asks: "Which other letters in the sequence matter to me?"',cx,cy-h/2+42,COL.dim,10);
+  txtBold('Attention: Every Position Talks to Every Other',cx,cy-h/2+18,COL.attn,12);
+  txt('"Which other letters in the sequence matter to me?"',cx,cy-h/2+34,COL.dim,9);
 
-  // Draw simplified attention visualization — nodes with connections
-  const nodeY = cy + 5;
+  const nodeY = cy + 2;
   const nodeLabels = ['A','T','G','C','C','T','A','G'];
   const nodeCount = nodeLabels.length;
-  const nodeSpacing = 40;
+  const nodeSpacing = 36;
   const startX = cx - (nodeCount - 1) * nodeSpacing / 2;
 
-  // Draw connections (attention lines)
   for(let i = 0; i < nodeCount; i++) {
     for(let j = 0; j < nodeCount; j++) {
       if(i === j) continue;
@@ -382,26 +374,23 @@ function drawAttnBlock(cx,cy,w,h,phase) {
         ctx.lineWidth = strength * 2;
         ctx.beginPath();
         ctx.moveTo(startX + i * nodeSpacing, nodeY);
-        ctx.quadraticCurveTo((startX + i * nodeSpacing + startX + j * nodeSpacing) / 2, nodeY - 25 - Math.abs(i-j)*6, startX + j * nodeSpacing, nodeY);
+        ctx.quadraticCurveTo((startX + i * nodeSpacing + startX + j * nodeSpacing) / 2, nodeY - 20 - Math.abs(i-j)*5, startX + j * nodeSpacing, nodeY);
         ctx.stroke();
       }
     }
   }
 
-  // Draw nodes
   for(let i = 0; i < nodeCount; i++) {
     const x = startX + i * nodeSpacing;
     const col = NUC_COL[nodeLabels[i]];
     ctx.fillStyle = '#0d1220';
-    ctx.beginPath(); ctx.arc(x, nodeY, 14, 0, Math.PI*2); ctx.fill();
+    ctx.beginPath(); ctx.arc(x, nodeY, 12, 0, Math.PI*2); ctx.fill();
     ctx.strokeStyle = col; ctx.lineWidth = 2;
-    ctx.beginPath(); ctx.arc(x, nodeY, 14, 0, Math.PI*2); ctx.stroke();
-    txt(nodeLabels[i], x, nodeY, col, 12);
+    ctx.beginPath(); ctx.arc(x, nodeY, 12, 0, Math.PI*2); ctx.stroke();
+    txt(nodeLabels[i], x, nodeY, col, 10);
   }
 
-  // Position encoding note
-  txt('+ Position stamps (so the model knows WHERE each letter is)', cx, cy + h/2 - 16, COL.dim, 9);
-
+  txt('+ Position stamps (so the model knows WHERE each letter is)', cx, cy + h/2 - 12, COL.dim, 8);
   ctx.restore();
 }
 
@@ -428,16 +417,16 @@ function drawResArrow(x1,y1,x2,y2,phase) {
 
 // ─── Layer stack tower ───
 function drawLayerTower(cx,cy,phase) {
-  const lw=100, lh=16, gap=3;
+  const lw=80, lh=11, gap=1.5;
   const layerTypes = [];
   const attnIdx = new Set([3,10,17,24,31]);
   const hclIdx = new Set([2,6,9,13,16,20,23,27,30]);
   const hcmIdx = new Set([1,5,8,12,15,19,22,26,29]);
   for(let i=0;i<32;i++){
-    if(attnIdx.has(i)) layerTypes.push('Attention');
+    if(attnIdx.has(i)) layerTypes.push('Attn');
     else if(hclIdx.has(i)) layerTypes.push('Long');
     else if(hcmIdx.has(i)) layerTypes.push('Short');
-    else layerTypes.push('Medium');
+    else layerTypes.push('Med');
   }
 
   const totalH = 32*(lh+gap);
@@ -450,19 +439,19 @@ function drawLayerTower(cx,cy,phase) {
     ctx.save(); ctx.globalAlpha=p;
     const tp = layerTypes[i];
     let col = COL.hyena;
-    if(tp==='Attention') col = COL.attn;
+    if(tp==='Attn') col = COL.attn;
     else if(tp==='Long') col = '#66bb6a';
-    else if(tp==='Medium') col = '#aed581';
+    else if(tp==='Med') col = '#aed581';
 
-    roundRect(cx-lw/2, y, lw, lh, 4, col+'22', col+'88');
-    txt(tp, cx, y+lh/2, col, 8);
+    roundRect(cx-lw/2, y, lw, lh, 3, col+'22', col+'88');
+    txt(tp, cx, y+lh/2, col, 7);
     ctx.restore();
   }
   const a2 = Math.min(1,phase);
-  arrow(cx, startY-15, cx, startY-2, COL.accent, a2*0.5);
-  arrow(cx, startY+totalH+2, cx, startY+totalH+15, COL.accent, a2*0.5);
-  txt('DNA in', cx, startY-25, COL.dim, 10);
-  txt('Understanding out', cx, startY+totalH+26, COL.dim, 10);
+  arrow(cx, startY-12, cx, startY-2, COL.accent, a2*0.5);
+  arrow(cx, startY+totalH+2, cx, startY+totalH+12, COL.accent, a2*0.5);
+  txt('DNA in', cx, startY-20, COL.dim, 8);
+  txt('Out', cx, startY+totalH+20, COL.dim, 8);
 }
 
 // ─── Output viz ───
@@ -494,63 +483,61 @@ function drawOutputBar(cx,cy,phase) {
 
 // ─── Main draw per step ───
 function drawStep(s, phase) {
-  const cx=W/2, topY=60;
+  const cx=W/2, topY=20;
 
   switch(s) {
     case 0: { // DNA input
-      drawHelix(cx, topY+80, W*0.75, 60, t*0.8);
-      txtBold('DNA Double Helix', cx, topY+130, COL.dna, 14);
-      txt('The model reads one strand as a sequence of letters:', cx, topY+150, COL.dim, 11);
-      drawNucBoxes(cx, topY+175, 12, phase, false, true);
-      txt('...this can be millions of letters long...', cx, topY+235, COL.dim, 11);
-      if(phase>0.5) arrow(cx, topY+250, cx, topY+275, COL.accent, (phase-0.5)*2);
-      if(phase>0.7) txt('Just 4 letters encode all life on Earth', cx, topY+290, COL.accent, 12);
+      drawHelix(cx, topY+50, W*0.7, 45, t*0.8);
+      txtBold('DNA Double Helix', cx, topY+90, COL.dna, 13);
+      txt('The model reads one strand as a sequence of letters:', cx, topY+108, COL.dim, 10);
+      drawNucBoxes(cx, topY+125, 12, phase, false, true);
+      txt('...this can be millions of letters long...', cx, topY+180, COL.dim, 10);
+      if(phase>0.5) arrow(cx, topY+192, cx, topY+210, COL.accent, (phase-0.5)*2);
+      if(phase>0.7) txt('Just 4 letters encode all life on Earth', cx, topY+225, COL.accent, 11);
       break;
     }
     case 1: { // Tokenize
-      txt('Each letter gets a number (its "token ID"):', cx, topY+20, COL.dim, 12);
-      drawNucBoxes(cx, topY+50, 10, phase, false);
+      txt('Each letter gets a number (its "token ID"):', cx, topY+15, COL.dim, 11);
+      drawNucBoxes(cx, topY+40, 10, phase, false);
       if(phase>0.3) {
-        // arrows between
         for(let i=0;i<10;i++){
           const a=Math.max(0,Math.min(1,(phase-0.3-i*0.03)*3));
           if(a<=0) continue;
           const bw2=38,gap2=4; const total2=(bw2+gap2)*10-gap2; const sx2=cx-total2/2;
           const xm=sx2+i*(bw2+gap2)+bw2/2;
-          arrow(xm, topY+90, xm, topY+115, COL.accent, a*0.5);
+          arrow(xm, topY+78, xm, topY+95, COL.accent, a*0.5);
         }
       }
       if(phase>0.4) {
         const ids=[1,4,3,2,2,4,1,3,14,14];
-        const labels=['A=1','T=4','G=3','C=2','C=2','T=4','A=1','G=3','N=14','N=14'];
         const bw=38,gap=4,count=10; const total=(bw+gap)*count-gap; const sx=cx-total/2;
         for(let i=0;i<count;i++){
           const a=Math.max(0,Math.min(1,(phase-0.4-i*0.05)*3));
           if(a<=0) continue;
           ctx.save(); ctx.globalAlpha=a;
           const x=sx+i*(bw+gap);
-          roundRect(x,topY+120,bw,36,6,COL.token+'22',COL.token);
-          txt(''+ids[i],x+bw/2,topY+138,COL.token,15);
+          roundRect(x,topY+100,bw,32,6,COL.token+'22',COL.token);
+          txt(''+ids[i],x+bw/2,topY+116,COL.token,14);
           ctx.restore();
         }
       }
       if(phase>0.7) {
-        roundRect(cx-200, topY+180, 400, 60, 8, '#111828', '#1e2a44');
-        txt('Why numbers? Computers can only do math with numbers,', cx, topY+198, COL.dim, 11);
-        txt('not letters. So we convert first, then compute.', cx, topY+214, COL.dim, 11);
-        txt('Dictionary size: 512 possible tokens', cx, topY+234, COL.accent, 10);
+        roundRect(cx-190, topY+150, 380, 50, 8, '#111828', '#1e2a44');
+        txt('Why numbers? Computers can only do math with numbers,', cx, topY+166, COL.dim, 10);
+        txt('not letters. So we convert first, then compute.', cx, topY+182, COL.dim, 10);
+        txt('Dictionary size: 512 possible tokens', cx, topY+200, COL.accent, 9);
       }
       break;
     }
     case 2: { // Embedding
-      txt('Simple numbers are not enough. Each gets a "profile card":', cx, topY+16, COL.dim, 12);
+      txt('Simple numbers are not enough. Each gets a "profile card":', cx, topY+10, COL.dim, 11);
       const ids=[1,4,3,2,2,4,1,3];
       const bw=30,gap=3,count=8; const total=(bw+gap)*count-gap; const sx=cx-total/2;
       for(let i=0;i<count;i++){
         ctx.save(); ctx.globalAlpha=0.6;
         const x=sx+i*(bw+gap);
-        roundRect(x,topY+35,bw,28,5,COL.token+'18',COL.token+'66');
-        txt(''+ids[i],x+bw/2,topY+49,COL.token,11);
+        roundRect(x,topY+28,bw,24,5,COL.token+'18',COL.token+'66');
+        txt(''+ids[i],x+bw/2,topY+40,COL.token,10);
         ctx.restore();
       }
       if(phase>0.2) {
@@ -558,69 +545,69 @@ function drawStep(s, phase) {
           const a=Math.max(0,Math.min(1,(phase-0.2-i*0.05)*3));
           if(a<=0) continue;
           const x=sx+i*(bw+gap)+bw/2;
-          arrow(x, topY+65, x, topY+88, COL.accent, a*0.4);
+          arrow(x, topY+54, x, topY+70, COL.accent, a*0.4);
         }
       }
-      if(phase>0.3) drawEmbedVectors(cx, topY+95, 8, phase-0.3);
+      if(phase>0.3) drawEmbedVectors(cx, topY+76, 8, phase-0.3);
       if(phase>0.6) {
-        roundRect(cx-220, topY+210, 440, 70, 8, '#111828', '#1e2a44');
-        txt('Each number becomes a list of 4,096 values', cx, topY+228, COL.embed, 12);
-        txt('Think of it as: "1" (just a number) becomes a detailed', cx, topY+248, COL.dim, 10);
-        txt('character sheet with 4,096 traits the model can reason about', cx, topY+264, COL.dim, 10);
+        roundRect(cx-210, topY+180, 420, 55, 8, '#111828', '#1e2a44');
+        txt('Each number becomes a list of 4,096 values', cx, topY+196, COL.embed, 11);
+        txt('"1" (just a number) becomes a detailed character sheet', cx, topY+212, COL.dim, 10);
+        txt('with 4,096 traits the model can reason about', cx, topY+226, COL.dim, 10);
       }
       break;
     }
     case 3: { // HCS
-      drawHyenaBlock(cx, topY+170, 380, 140, 'Short-Range Pattern Detector', 'Slides a tiny window (~7 letters) across the DNA', 50, COL.hyena, phase);
+      drawHyenaBlock(cx, topY+110, 380, 120, 'Short-Range Pattern Detector', 'Slides a tiny window (~7 letters) across the DNA', 50, COL.hyena, phase);
       if(phase>0.3) {
-        roundRect(cx-200, topY+280, 400, 80, 8, '#111828', COL.hyena+'33');
-        txtBold('What does it find?', cx, topY+298, COL.hyena, 12);
-        txt('Codons (3-letter codes): ATG = "start making protein"', cx, topY+316, COL.dim, 10);
-        txt('Dinucleotides (2-letter pairs): CG = often a regulatory signal', cx, topY+334, COL.dim, 10);
-        txt('Think: checking individual words in a sentence', cx, topY+352, COL.dim+'cc', 9);
+        roundRect(cx-190, topY+200, 380, 70, 8, '#111828', COL.hyena+'33');
+        txtBold('What does it find?', cx, topY+215, COL.hyena, 11);
+        txt('Codons (3-letter codes): ATG = "start making protein"', cx, topY+232, COL.dim, 10);
+        txt('Dinucleotides (2-letter pairs): CG = often a regulatory signal', cx, topY+248, COL.dim, 10);
+        txt('Think: checking individual words in a sentence', cx, topY+264, COL.dim+'cc', 9);
       }
       break;
     }
     case 4: { // HCM
-      drawHyenaBlock(cx, topY+170, 380, 140, 'Medium-Range Pattern Detector', 'Slides a wider window (~128 letters) across the DNA', 120, '#aed581', phase);
+      drawHyenaBlock(cx, topY+110, 380, 120, 'Medium-Range Pattern Detector', 'Slides a wider window (~128 letters) across the DNA', 120, '#aed581', phase);
       if(phase>0.3) {
-        roundRect(cx-200, topY+280, 400, 80, 8, '#111828', '#aed581'+'33');
-        txtBold('What does it find?', cx, topY+298, '#aed581', 12);
-        txt('Promoters: "start reading this gene here" signals (~100 bp)', cx, topY+316, COL.dim, 10);
-        txt('Ribosome binding sites, TATA boxes, regulatory regions', cx, topY+334, COL.dim, 10);
-        txt('Think: checking whole sentences and paragraphs', cx, topY+352, COL.dim+'cc', 9);
+        roundRect(cx-190, topY+200, 380, 70, 8, '#111828', '#aed581'+'33');
+        txtBold('What does it find?', cx, topY+215, '#aed581', 11);
+        txt('Promoters: "start reading this gene here" signals (~100 bp)', cx, topY+232, COL.dim, 10);
+        txt('Ribosome binding sites, TATA boxes, regulatory regions', cx, topY+248, COL.dim, 10);
+        txt('Think: checking whole sentences and paragraphs', cx, topY+264, COL.dim+'cc', 9);
       }
       break;
     }
     case 5: { // HCL
-      drawHyenaBlock(cx, topY+170, 380, 140, 'Long-Range Pattern Detector', 'Looks at the ENTIRE sequence at once (up to 1,000,000 letters!)', 200, '#66bb6a', phase);
+      drawHyenaBlock(cx, topY+110, 380, 120, 'Long-Range Pattern Detector', 'Looks at the ENTIRE sequence at once (up to 1,000,000 letters!)', 200, '#66bb6a', phase);
       if(phase>0.3) {
-        roundRect(cx-220, topY+280, 440, 100, 8, '#111828', '#66bb6a33');
-        txtBold('What does it find?', cx, topY+298, '#66bb6a', 12);
-        txt('How genes thousands of letters apart relate to each other', cx, topY+316, COL.dim, 10);
-        txt('Operons (groups of genes that work together)', cx, topY+334, COL.dim, 10);
-        txt('Chromosome-scale organizational patterns', cx, topY+352, COL.dim, 10);
-        txt('Think: understanding how chapters of a book connect', cx, topY+370, COL.dim+'cc', 9);
+        roundRect(cx-210, topY+200, 420, 80, 8, '#111828', '#66bb6a33');
+        txtBold('What does it find?', cx, topY+215, '#66bb6a', 11);
+        txt('How genes thousands of letters apart relate to each other', cx, topY+232, COL.dim, 10);
+        txt('Operons (groups of genes that work together)', cx, topY+248, COL.dim, 10);
+        txt('Chromosome-scale organizational patterns', cx, topY+264, COL.dim, 10);
+        txt('Think: understanding how chapters of a book connect', cx, topY+280, COL.dim+'cc', 9);
       }
       break;
     }
     case 6: { // Attention
-      drawAttnBlock(cx, topY+170, 420, 160, phase);
+      drawAttnBlock(cx, topY+110, 400, 130, phase);
       if(phase>0.3) {
-        roundRect(cx-220, topY+290, 440, 80, 8, '#111828', COL.attn+'33');
-        txtBold('Why is this different from the pattern detectors?', cx, topY+308, COL.attn, 11);
-        txt('Pattern detectors slide a window (local view). Attention lets', cx, topY+326, COL.dim, 10);
-        txt('EVERY letter look at EVERY other letter directly (global view).', cx, topY+344, COL.dim, 10);
-        txt('Only ~16% of layers use this (5 of 32) because it is expensive', cx, topY+362, COL.dim+'cc', 9);
+        roundRect(cx-210, topY+205, 420, 65, 8, '#111828', COL.attn+'33');
+        txtBold('Why is this different from the pattern detectors?', cx, topY+220, COL.attn, 10);
+        txt('Pattern detectors slide a window (local view). Attention lets', cx, topY+236, COL.dim, 10);
+        txt('EVERY letter look at EVERY other letter directly (global view).', cx, topY+252, COL.dim, 10);
+        txt('Only ~16% of layers use this (5 of 32) because it is expensive', cx, topY+266, COL.dim+'cc', 9);
       }
       break;
     }
     case 7: { // Pattern - layer tower
-      drawLayerTower(cx-250, topY+320, phase);
+      drawLayerTower(cx-240, topY+220, phase);
 
-      const rx=cx+110, ry=topY+60;
-      txtBold('The Assembly Line: 32 Layers', rx, ry, COL.accent, 14);
-      txt('Data flows through this repeating cycle:', rx, ry+20, COL.dim, 11);
+      const rx=cx+100, ry=topY+20;
+      txtBold('The Assembly Line: 32 Layers', rx, ry, COL.accent, 13);
+      txt('Data flows through this repeating cycle:', rx, ry+16, COL.dim, 10);
 
       const pattern = [
         {label:'Short patterns (~7 letters)',   col:COL.hyena,  icon:'nearby words'},
@@ -632,130 +619,126 @@ function drawStep(s, phase) {
         const a=Math.max(0,Math.min(1,(phase-i*0.12)*2));
         if(a<=0) continue;
         ctx.save(); ctx.globalAlpha=a;
-        const y=ry+50+i*55;
-        roundRect(rx-130,y-16,260,32,6,pattern[i].col+'18',pattern[i].col);
-        txt(pattern[i].label,rx,y-2,pattern[i].col,10);
-        txt(pattern[i].icon,rx,y+12,COL.dim,8);
-        if(i<3) arrow(rx, y+18, rx, y+32, COL.accent, a*0.4);
+        const y=ry+40+i*45;
+        roundRect(rx-125,y-14,250,28,6,pattern[i].col+'18',pattern[i].col);
+        txt(pattern[i].label,rx,y-3,pattern[i].col,9);
+        txt(pattern[i].icon,rx,y+10,COL.dim,7);
+        if(i<3) arrow(rx, y+16, rx, y+24, COL.accent, a*0.4);
         ctx.restore();
       }
 
       if(phase>0.5) {
-        const ny=ry+285;
-        drawMLPBlock(rx, ny, 200, 44, phase-0.5);
+        const ny=ry+230;
+        drawMLPBlock(rx, ny, 190, 38, phase-0.5);
         if(phase>0.55) {
-          drawResArrow(rx+140, ry+50, rx+140, ry+270, phase-0.55);
-          txt('Shortcut', rx+158, ry+160, COL.res, 8);
-          txt('(preserves', rx+158, ry+172, COL.res, 7);
-          txt('original info)', rx+158, ry+184, COL.res, 7);
+          drawResArrow(rx+130, ry+40, rx+130, ry+218, phase-0.55);
+          txt('Shortcut', rx+146, ry+120, COL.res, 7);
+          txt('(preserves info)', rx+146, ry+132, COL.res, 7);
         }
       }
 
       if(phase>0.7) {
-        const by = ry+340;
-        roundRect(rx-130, by, 260, 50, 8, '#111828', '#1e2a44');
-        txt('This cycle repeats ~8 times = 32 layers total', rx, by+16, COL.accent, 10);
-        txt('Each pass builds deeper understanding of the DNA', rx, by+34, COL.dim, 9);
+        const by = ry+270;
+        roundRect(rx-125, by, 250, 40, 8, '#111828', '#1e2a44');
+        txt('This cycle repeats ~8 times = 32 layers', rx, by+14, COL.accent, 9);
+        txt('Each pass builds deeper understanding', rx, by+28, COL.dim, 8);
       }
       break;
     }
     case 8: { // Output
-      txt('After 32 layers of processing...', cx, topY+20, COL.dim, 12);
+      txt('After 32 layers of processing...', cx, topY+12, COL.dim, 11);
       if(phase>0.05){
-        roundRect(cx-100,topY+40,200,35,6,COL.accent+'14',COL.accent+'44');
-        txtBold('Step A: Balance the values', cx, topY+50, COL.accent, 11);
-        txt('(normalization)', cx, topY+66, COL.dim, 9);
+        roundRect(cx-95,topY+28,190,30,6,COL.accent+'14',COL.accent+'44');
+        txtBold('Step A: Balance the values', cx, topY+37, COL.accent, 10);
+        txt('(normalization)', cx, topY+50, COL.dim, 8);
       }
-      if(phase>0.2) arrow(cx, topY+80, cx, topY+100, COL.accent, Math.min(1,(phase-0.2)*3));
+      if(phase>0.2) arrow(cx, topY+62, cx, topY+76, COL.accent, Math.min(1,(phase-0.2)*3));
       if(phase>0.25){
-        roundRect(cx-120,topY+105,240,35,6,COL.output+'14',COL.output+'66');
-        txtBold('Step B: Convert to 4 scores', cx, topY+115, COL.output, 11);
-        txt('(one score per possible letter: A, T, G, C)', cx, topY+131, COL.dim, 9);
+        roundRect(cx-110,topY+80,220,30,6,COL.output+'14',COL.output+'66');
+        txtBold('Step B: Convert to 4 scores', cx, topY+89, COL.output, 10);
+        txt('(one score per letter: A, T, G, C)', cx, topY+102, COL.dim, 8);
       }
-      if(phase>0.4) arrow(cx, topY+145, cx, topY+165, COL.accent, Math.min(1,(phase-0.4)*3));
+      if(phase>0.4) arrow(cx, topY+114, cx, topY+128, COL.accent, Math.min(1,(phase-0.4)*3));
       if(phase>0.45){
-        roundRect(cx-110,topY+170,220,40,6,'#1a2040','#fff3');
-        txtBold('Step C: Convert scores to %', cx, topY+182, '#fff', 11);
-        txt('(softmax: makes scores add up to 100%)', cx, topY+200, COL.dim, 9);
+        roundRect(cx-100,topY+132,200,34,6,'#1a2040','#fff3');
+        txtBold('Step C: Convert scores to %', cx, topY+142, '#fff', 10);
+        txt('(softmax: makes scores add up to 100%)', cx, topY+156, COL.dim, 8);
       }
-      if(phase>0.6) arrow(cx, topY+215, cx, topY+240, COL.accent, Math.min(1,(phase-0.6)*3));
-      if(phase>0.65) drawOutputBar(cx, topY+380, phase-0.65);
+      if(phase>0.6) arrow(cx, topY+170, cx, topY+188, COL.accent, Math.min(1,(phase-0.6)*3));
+      if(phase>0.65) drawOutputBar(cx, topY+300, phase-0.65);
       break;
     }
     case 9: { // Predict & generate
-      const ly=topY+30;
-      txtBold('Two things Evo 2 can do:', cx, ly, COL.accent, 16);
+      const ly=topY+10;
+      txtBold('Two things Evo 2 can do:', cx, ly, COL.accent, 14);
 
-      // Left: Scoring
-      const lx=cx-180;
+      const lx=cx-175;
       if(phase>0.1) {
-        roundRect(lx-120,ly+25,240,220,10,'#0f1828',COL.accent+'44');
-        txtBold('1. Check if DNA is "correct"', lx, ly+48, COL.accent, 12);
+        roundRect(lx-115,ly+18,230,195,10,'#0f1828',COL.accent+'44');
+        txtBold('1. Check if DNA is "correct"', lx, ly+38, COL.accent, 11);
         if(phase>0.2) {
-          txt('Feed in a DNA sequence and ask:', lx, ly+75, COL.dim, 10);
-          txt('"Does this look like real, functional DNA?"', lx, ly+92, '#b8c4d8', 10);
+          txt('Feed in a DNA sequence and ask:', lx, ly+60, COL.dim, 9);
+          txt('"Does this look like real, functional DNA?"', lx, ly+74, '#b8c4d8', 9);
         }
         if(phase>0.35) {
-          txt('Example: Is this mutation harmful?', lx, ly+120, COL.text, 10);
-          roundRect(lx-90,ly+132,180,20,4,COL.hyena+'11',COL.hyena+'44');
-          txt('Normal: ATGCCTAG   Score: 95%', lx, ly+142, COL.hyena, 9);
-          roundRect(lx-90,ly+156,180,20,4,COL.res+'11',COL.res+'44');
-          txt('Mutant: ATGCCAAG   Score: 31%', lx, ly+166, COL.res, 9);
+          txt('Example: Is this mutation harmful?', lx, ly+96, COL.text, 9);
+          roundRect(lx-85,ly+106,170,18,4,COL.hyena+'11',COL.hyena+'44');
+          txt('Normal: ATGCCTAG   Score: 95%', lx, ly+115, COL.hyena, 8);
+          roundRect(lx-85,ly+128,170,18,4,COL.res+'11',COL.res+'44');
+          txt('Mutant: ATGCCAAG   Score: 31%', lx, ly+137, COL.res, 8);
           if(phase>0.45) {
-            txtBold('Much lower score = probably harmful!', lx, ly+195, COL.output, 10);
-            txt('(No lab experiment needed)', lx, ly+212, COL.dim, 9);
+            txtBold('Lower score = probably harmful!', lx, ly+162, COL.output, 9);
+            txt('(No lab experiment needed)', lx, ly+176, COL.dim, 8);
           }
         }
       }
 
-      // Right: Generation
-      const rx2=cx+180;
+      const rx2=cx+175;
       if(phase>0.2) {
-        roundRect(rx2-120,ly+25,240,220,10,'#0f1828',COL.hyena+'44');
-        txtBold('2. Write new DNA', rx2, ly+48, COL.hyena, 12);
+        roundRect(rx2-115,ly+18,230,195,10,'#0f1828',COL.hyena+'44');
+        txtBold('2. Write new DNA', rx2, ly+38, COL.hyena, 11);
         if(phase>0.3) {
-          txt('Like autocomplete on your phone,', rx2, ly+75, COL.dim, 10);
-          txt('but for DNA sequences:', rx2, ly+92, COL.dim, 10);
+          txt('Like autocomplete on your phone,', rx2, ly+60, COL.dim, 9);
+          txt('but for DNA sequences:', rx2, ly+74, COL.dim, 9);
         }
         if(phase>0.4) {
           const seq='ATGCCTAG';
           const generated='GCTA';
-          const py2=ly+115;
-          txt('Given:', rx2-70, py2-2, COL.dim, 9, 'left');
+          const py2=ly+95;
+          txt('Given:', rx2-65, py2-2, COL.dim, 8, 'left');
           for(let i=0;i<seq.length;i++){
             const ch=seq[i]; const col=NUC_COL[ch];
             ctx.save(); ctx.globalAlpha=0.5;
-            roundRect(rx2-40+i*22, py2-10, 20, 22, 3, col+'22', col+'66');
-            txt(ch, rx2-40+i*22+10, py2+1, col, 10);
+            roundRect(rx2-35+i*20, py2-9, 18, 20, 3, col+'22', col+'66');
+            txt(ch, rx2-35+i*20+9, py2+1, col, 9);
             ctx.restore();
           }
-          txt('Generates:', rx2-58, py2+22, COL.dim, 9, 'left');
+          txt('Generates:', rx2-52, py2+18, COL.dim, 8, 'left');
           for(let i=0;i<generated.length;i++){
             const a=Math.max(0,Math.min(1,(phase-0.5-i*0.1)*3));
             if(a<=0)continue;
             const ch=generated[i]; const col=NUC_COL[ch];
             ctx.save(); ctx.globalAlpha=a;
-            roundRect(rx2-40+(seq.length+i)*22, py2-10, 20, 22, 3, col+'44', col);
-            txt(ch, rx2-40+(seq.length+i)*22+10, py2+1, col, 11);
-            glow(rx2-40+(seq.length+i)*22+10, py2+1, 15, col, 0.4);
+            roundRect(rx2-35+(seq.length+i)*20, py2-9, 18, 20, 3, col+'44', col);
+            txt(ch, rx2-35+(seq.length+i)*20+9, py2+1, col, 10);
+            glow(rx2-35+(seq.length+i)*20+9, py2+1, 12, col, 0.4);
             ctx.restore();
           }
         }
         if(phase>0.6) {
-          txt('Can design entirely new:', rx2, ly+165, '#b8c4d8', 10);
-          txt('Genes, promoters, regulatory', rx2, ly+182, COL.dim, 10);
-          txt('elements, even whole genomes', rx2, ly+198, COL.dim, 10);
-          txt('(like AI art, but for biology)', rx2, ly+218, COL.dim+'cc', 9);
+          txt('Can design entirely new:', rx2, ly+140, '#b8c4d8', 9);
+          txt('Genes, promoters, regulatory', rx2, ly+155, COL.dim, 9);
+          txt('elements, even whole genomes', rx2, ly+170, COL.dim, 9);
+          txt('(like AI art, but for biology)', rx2, ly+188, COL.dim+'cc', 8);
         }
       }
 
-      // Bottom summary
       if(phase>0.7) {
-        const by=ly+260;
-        roundRect(cx-240,by,480,65,10,'#111828','#243050');
-        txtBold('Evo 2 = a spell-checker + autocomplete for DNA', cx, by+16, COL.accent, 13);
-        txt('Trained on 8.8 TRILLION DNA letters from bacteria, viruses,', cx, by+36, COL.dim, 10);
-        txt('plants, animals, fungi — essentially all known life on Earth', cx, by+52, COL.dim, 10);
+        const by=ly+225;
+        roundRect(cx-230,by,460,50,10,'#111828','#243050');
+        txtBold('Evo 2 = a spell-checker + autocomplete for DNA', cx, by+14, COL.accent, 12);
+        txt('Trained on 8.8 TRILLION DNA letters from bacteria, viruses,', cx, by+30, COL.dim, 9);
+        txt('plants, animals, fungi — essentially all known life on Earth', cx, by+43, COL.dim, 9);
       }
       break;
     }
@@ -791,10 +774,10 @@ function draw() {
     const phase = Math.min(t * 0.012 * speedMul, 1.5);
     drawStep(step, phase);
   } else {
-    drawHelix(W/2, H/2-60, W*0.6, 80, t*0.6);
-    txtBold('Evo 2', W/2, H/2+30, COL.accent, 28);
-    txt('A Deep Learning Model That Reads DNA', W/2, H/2+55, COL.dim, 14);
-    txt('Press Play or Next to begin the walkthrough', W/2, H/2+80, COL.dim+'88', 12);
+    drawHelix(W/2, H/2-50, W*0.6, 60, t*0.6);
+    txtBold('Evo 2', W/2, H/2+15, COL.accent, 26);
+    txt('A Deep Learning Model That Reads DNA', W/2, H/2+38, COL.dim, 13);
+    txt('Press Play or Next to begin the walkthrough', W/2, H/2+58, COL.dim+'88', 11);
   }
   drawProgress();
   updateParticles();
