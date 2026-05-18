@@ -14,15 +14,22 @@
   .top-nav a { color:#4fc3f7; text-decoration:none; font-size:.9rem; }
   .top-nav a:hover { text-decoration:underline; }
 
-  /* ── Hero ── */
-  .hero { text-align:center; padding:50px 24px 30px; position:relative; overflow:hidden; }
+  /* ── Hero (sticky) ── */
+  .hero-wrap { position:sticky; top:0; z-index:100; background:#06080f; border-bottom:1px solid #111828; transition:all .3s; }
+  .hero-wrap.compact .hero { padding:12px 24px 10px; }
+  .hero-wrap.compact .hero h1 { font-size:1.4rem; }
+  .hero-wrap.compact .hero .subtitle { font-size:.8rem; margin-top:4px; max-height:0; overflow:hidden; opacity:0; transition:all .3s; }
+  .hero-wrap.compact .hero .model-badges { margin-top:8px; gap:6px; }
+  .hero-wrap.compact .hero .mbadge { font-size:.68rem; padding:3px 10px; }
+
+  .hero { text-align:center; padding:40px 24px 24px; position:relative; overflow:hidden; transition:all .3s; }
   .hero::before { content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:600px; height:600px;
     background:radial-gradient(circle, #4fc3f708 0%, transparent 70%); pointer-events:none; }
-  .hero h1 { font-size:2.8rem; font-weight:800; letter-spacing:-1px;
+  .hero h1 { font-size:2.8rem; font-weight:800; letter-spacing:-1px; transition:font-size .3s;
     background:linear-gradient(135deg,#4fc3f7,#81c784); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
-  .hero .subtitle { color:#6b7fa0; font-size:1.1rem; margin-top:8px; max-width:650px; margin-left:auto; margin-right:auto; }
-  .hero .model-badges { display:flex; justify-content:center; gap:10px; margin-top:18px; flex-wrap:wrap; }
-  .hero .mbadge { font-size:.78rem; padding:5px 14px; border-radius:8px; font-weight:600; }
+  .hero .subtitle { color:#6b7fa0; font-size:1.1rem; margin-top:8px; max-width:650px; margin-left:auto; margin-right:auto; transition:all .3s; }
+  .hero .model-badges { display:flex; justify-content:center; gap:10px; margin-top:18px; flex-wrap:wrap; transition:all .3s; }
+  .hero .mbadge { font-size:.78rem; padding:5px 14px; border-radius:8px; font-weight:600; transition:all .3s; }
 
   /* ── Section ── */
   .section { max-width:860px; margin:0 auto; padding:40px 24px; }
@@ -87,14 +94,16 @@
   <a href="evo2_animation.html">Skip to Animation &rarr;</a>
 </nav>
 
-<div class="hero">
-  <h1>Evo 2</h1>
-  <div class="subtitle">Before we dive into how Evo 2 processes DNA step-by-step, let's understand the AI building blocks it uses. No prior machine learning knowledge required.</div>
-  <div class="model-badges">
-    <span class="mbadge" style="background:#81c78422;border:1px solid #81c784;color:#a5d6a7">SSM / Hyena</span>
-    <span class="mbadge" style="background:#ab47bc22;border:1px solid #ab47bc;color:#ce93d8">Transformer (Attention)</span>
-    <span class="mbadge" style="background:#66bb6a22;border:1px solid #66bb6a;color:#a5d6a7">Convolution</span>
-    <span class="mbadge" style="background:#ffa72622;border:1px solid #ffa726;color:#ffcc80">Hybrid Architecture</span>
+<div class="hero-wrap" id="heroWrap">
+  <div class="hero">
+    <h1>Evo 2</h1>
+    <div class="subtitle">Before we dive into how Evo 2 processes DNA step-by-step, let's understand the AI building blocks it uses. No prior machine learning knowledge required.</div>
+    <div class="model-badges">
+      <span class="mbadge" style="background:#81c78422;border:1px solid #81c784;color:#a5d6a7">SSM / Hyena</span>
+      <span class="mbadge" style="background:#ab47bc22;border:1px solid #ab47bc;color:#ce93d8">Transformer (Attention)</span>
+      <span class="mbadge" style="background:#66bb6a22;border:1px solid #66bb6a;color:#a5d6a7">Convolution</span>
+      <span class="mbadge" style="background:#ffa72622;border:1px solid #ffa726;color:#ffcc80">Hybrid Architecture</span>
+    </div>
   </div>
 </div>
 
@@ -517,6 +526,16 @@ drawSSM();
 
 // Redraw on resize
 window.addEventListener('resize', () => { drawNN(); drawConv(); drawAttn(); drawSSM(); });
+
+// ─── Sticky hero: compact on scroll ───
+const heroWrap = document.getElementById('heroWrap');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 80) {
+    heroWrap.classList.add('compact');
+  } else {
+    heroWrap.classList.remove('compact');
+  }
+}, { passive: true });
 </script>
 
 </body>
