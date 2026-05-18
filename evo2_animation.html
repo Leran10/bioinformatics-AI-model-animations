@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evo 2 — How It Works (Animated)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#0a0e1a; color:#e0e6f0; font-family:'Segoe UI',system-ui,sans-serif; overflow-x:hidden; }
+
+  /* ── Top bar ── */
+  header { text-align:center; padding:30px 20px 10px; }
+  header h1 { font-size:2.2rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
+  @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+  header p { color:#8892a8; margin-top:6px; font-size:0.95rem; }
+
+  /* ── Controls ── */
+  #controls { display:flex; justify-content:center; gap:14px; padding:16px; flex-wrap:wrap; }
+  button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:9px 22px; border-radius:8px; cursor:pointer; font-size:.9rem; transition:.2s; }
+  button:hover { background:#24304e; border-color:#4fc3f7; color:#fff; }
+  button.active { background:#1b2d4d; border-color:#4fc3f7; color:#4fc3f7; }
+  #speed-label { color:#6b7a96; font-size:.85rem; align-self:center; }
+
+  /* ── Stage ── */
+  #stage { position:relative; width:100%; max-width:1100px; margin:0 auto; padding:20px; }
+  canvas { display:block; margin:0 auto; border-radius:12px; }
+
+  /* ── Info panel ── */
+  #info { max-width:900px; margin:20px auto; padding:24px 30px; background:#111828; border:1px solid #1e2a44; border-radius:12px; min-height:100px; transition:opacity .4s; }
+  #info h2 { font-size:1.15rem; color:#4fc3f7; margin-bottom:8px; }
+  #info p { line-height:1.6; font-size:.92rem; color:#a0adc4; }
+  .hl { color:#ce93d8; font-weight:600; }
+  .hl2 { color:#4fc3f7; font-weight:600; }
+  .hl3 { color:#81c784; font-weight:600; }
+
+  /* ── Legend ── */
+  #legend { display:flex; justify-content:center; gap:24px; padding:12px; flex-wrap:wrap; font-size:.82rem; }
+  .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
+  .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Evo 2 — Genomic Foundation Model</h1>
+  <p>StripedHyena-2 architecture &middot; 7B parameters &middot; up to 1 M nucleotide context</p>
+</header>
+
+<div id="controls">
+  <button id="btn-play" class="active">&#9654; Play</button>
+  <button id="btn-pause">&#10074;&#10074; Pause</button>
+  <button id="btn-reset">&#8635; Reset</button>
+  <button id="btn-prev">&larr; Prev</button>
+  <button id="btn-next">Next &rarr;</button>
+  <span id="speed-label">Speed</span>
+  <input type="range" id="speed" min="1" max="5" value="3" style="width:100px;">
+</div>
+
+<div id="legend">
+  <div class="leg"><span style="background:#4fc3f7"></span> Data flow</div>
+  <div class="leg"><span style="background:#81c784"></span> Hyena Conv (Short / Med / Long)</div>
+  <div class="leg"><span style="background:#ce93d8"></span> Multi-Head Attention</div>
+  <div class="leg"><span style="background:#ffb74d"></span> MLP / Feed-Forward</div>
+  <div class="leg"><span style="background:#ef5350"></span> Residual connection</div>
+</div>
+
+<div id="stage">
+  <canvas id="c"></canvas>
+</div>
+<div id="info"><h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to step through how Evo 2 processes a raw DNA sequence and predicts the next nucleotide. Each stage is animated and explained below.</p></div>
+
+<script>
+// ─── Canvas setup ───
+const canvas = document.getElementById('c');
+const ctx = canvas.getContext('2d');
+const DPR = window.devicePixelRatio || 1;
+let W, H;
+function resize() {
+  W = Math.min(1060, window.innerWidth - 40);
+  H = 720;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+}
+resize();
+window.addEventListener('resize', () => { resize(); draw(); });
+
+// ─── Color palette ───
+const COL = {
+  bg: '#0d1220',
+  box: '#151d30',
+  border: '#243050',
+  text: '#c8d0e0',
+  dim: '#5a6a88',
+  accent: '#4fc3f7',
+  hyena: '#81c784',
+  attn: '#ce93d8',
+  mlp: '#ffb74d',
+  res: '#ef5350',
+  dna: '#66bb6a',
+  token: '#42a5f5',
+  embed: '#7e57c2',
+  output: '#ffa726',
+};
+
+// ─── Steps definition ───
+const STEPS = [
+  { id:'input',   title:'Step 1 — DNA Input',
+    text:'Evo 2 takes a <span class="hl3">raw DNA string</span> as input — single nucleotides like A, T, G, C. No k-mer encoding, no byte-pair tokenization. The model sees the genome one base at a time, exactly as nature wrote it.' },
+  { id:'tokenize', title:'Step 2 — Character-Level Tokenization',
+    text:'Each nucleotide is mapped to an <span class="hl2">integer token ID</span> using a 512-token vocabulary (covers A/C/G/T/N plus special tokens). A 1 million bp genome becomes 1 million tokens — no information loss.' },
+  { id:'embed',   title:'Step 3 — Token Embedding',
+    text:'Token IDs index into a <span class="hl">learned embedding table</span> (512 &times; 4096 for the 7B model). Each nucleotide becomes a dense 4096-dimensional vector, forming a tensor of shape <b>[batch, seq_len, 4096]</b>.' },
+  { id:'hcs',     title:'Step 4 — Hyena Short Convolution (HCS)',
+    text:'The first layers use <span class="hl3">short convolution filters (~7 bp)</span>. These capture <b>local motifs</b>: dinucleotide frequencies, codon boundaries, small regulatory signals. The Hyena operator projects input into gating signals (x1, x2) and values (v), applies a causal conv, gates, then uses FFT-based convolution with a short learned filter. Cost: <b>O(L log L)</b>.' },
+  { id:'hcm',     title:'Step 5 — Hyena Medium Convolution (HCM)',
+    text:'Next come <span class="hl3">medium-range convolution layers (filter ~128 bp)</span>. These recognize <b>promoter-sized features</b>: TATA boxes, ribosome binding sites, regulatory elements spanning ~50–200 bp. Same Hyena gated-convolution mechanism, but the implicitly-parameterized filter spans a wider receptive field.' },
+  { id:'hcl',     title:'Step 6 — Hyena Long Convolution (HCL)',
+    text:'<span class="hl3">Long convolution layers</span> use filters that span the <b>entire sequence length</b> (up to 1M bp). These capture operons, gene neighborhoods, and chromosome-scale structure. The filter is generated by a small MLP with sinusoidal activations (implicit parametrization), keeping parameter count manageable. The FFT trick makes this O(L log L) instead of O(L&sup2;).' },
+  { id:'attn',    title:'Step 7 — Multi-Head Attention',
+    text:'Only <span class="hl">~16% of layers</span> (5 out of 32 in the 7B model) use standard <span class="hl">grouped-query attention with RoPE</span>. These provide <b>exact pairwise interactions</b> between all positions — critical for resolving long-range dependencies that convolution alone might miss (e.g., enhancer–promoter pairing). Flash Attention v2 keeps it efficient.' },
+  { id:'pattern', title:'Step 8 — The Layer Interleaving Pattern',
+    text:'Layers follow a repeating motif: <span class="hl3">HCS</span> &rarr; <span class="hl3">HCM</span> &rarr; <span class="hl3">HCL</span> &rarr; <span class="hl">Attention</span>. This creates a <b>multi-scale hierarchy</b>: local features are extracted first, then progressively longer-range patterns, punctuated by global attention for synchronization. Each layer also has an <span class="hl" style="color:#ffb74d">MLP block</span> (Gated Linear Unit + GELU) and <span class="hl" style="color:#ef5350">residual connections</span>.' },
+  { id:'output',  title:'Step 9 — Final Norm + Output Projection',
+    text:'After all 32 layers, a final <b>RMSNorm</b> stabilizes the representation. Then an <span class="hl" style="color:#ffa726">output projection</span> maps 4096-dim hidden states down to 512 logits (one per vocab token). A <b>softmax</b> gives the probability of the next nucleotide at every position.' },
+  { id:'predict', title:'Step 10 — Prediction & Generation',
+    text:'For <b>scoring</b>, the per-position log-likelihoods reveal how "natural" a sequence is — enabling zero-shot variant effect prediction. For <b>generation</b>, the model samples the next nucleotide, appends it, and repeats. Hyena layers can decode in <b>O(1) memory per step</b> via their state-space equivalence — no growing KV cache for 84% of layers.' },
+];
+
+// ─── State ───
+let step = -1;     // current step (-1 = splash)
+let t = 0;         // animation time
+let playing = true;
+let autoAdvance = 0;
+let speedMul = 1;
+const particles = [];
+
+// ─── UI ───
+const infoDiv = document.getElementById('info');
+const btnPlay  = document.getElementById('btn-play');
+const btnPause = document.getElementById('btn-pause');
+const btnReset = document.getElementById('btn-reset');
+const btnPrev  = document.getElementById('btn-prev');
+const btnNext  = document.getElementById('btn-next');
+const speedSlider = document.getElementById('speed');
+
+btnPlay.onclick  = () => { playing = true; btnPlay.classList.add('active'); btnPause.classList.remove('active'); if(step<0) advance(); };
+btnPause.onclick = () => { playing = false; btnPause.classList.add('active'); btnPlay.classList.remove('active'); };
+btnReset.onclick = () => { step = -1; t = 0; autoAdvance = 0; particles.length = 0; playing = true; btnPlay.classList.add('active'); btnPause.classList.remove('active'); updateInfo(); };
+btnNext.onclick  = () => advance();
+btnPrev.onclick  = () => { if(step > 0) { step--; t = 0; autoAdvance = 0; particles.length = 0; updateInfo(); } };
+speedSlider.oninput = () => { speedMul = [0.3, 0.6, 1, 1.6, 2.5][speedSlider.value - 1]; };
+
+function advance() {
+  if (step < STEPS.length - 1) { step++; t = 0; autoAdvance = 0; particles.length = 0; updateInfo(); }
+}
+function updateInfo() {
+  if (step < 0) { infoDiv.innerHTML = '<h2>Welcome</h2><p>Press <b>Play</b> or <b>Next</b> to walk through how Evo 2 processes a DNA sequence.</p>'; return; }
+  const s = STEPS[step];
+  infoDiv.innerHTML = `<h2>${s.title}</h2><p>${s.text}</p>`;
+}
+
+// ─── Drawing helpers ───
+function roundRect(x,y,w,h,r,fill,stroke) {
+  ctx.beginPath(); ctx.roundRect(x,y,w,h,r); if(fill){ctx.fillStyle=fill;ctx.fill();} if(stroke){ctx.strokeStyle=stroke;ctx.lineWidth=1.2;ctx.stroke();}
+}
+function arrow(x1,y1,x2,y2,color,alpha) {
+  ctx.save(); ctx.globalAlpha=alpha||1;
+  ctx.strokeStyle=color; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke();
+  const a=Math.atan2(y2-y1,x2-x1); const s=9;
+  ctx.fillStyle=color; ctx.beginPath(); ctx.moveTo(x2,y2); ctx.lineTo(x2-s*Math.cos(a-0.35),y2-s*Math.sin(a-0.35)); ctx.lineTo(x2-s*Math.cos(a+0.35),y2-s*Math.sin(a+0.35)); ctx.closePath(); ctx.fill();
+  ctx.restore();
+}
+function txt(str,x,y,color,size,align) {
+  ctx.fillStyle=color||COL.text; ctx.font=(size||13)+'px "Segoe UI",system-ui,sans-serif'; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
+}
+function glow(x,y,r,color,a) {
+  const g=ctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,color+''); g.addColorStop(1,'transparent');
+  ctx.save(); ctx.globalAlpha=a||0.3; ctx.fillStyle=g; ctx.fillRect(x-r,y-r,r*2,r*2); ctx.restore();
+}
+
+// ─── Particle system ───
+function spawnParticle(x,y,tx,ty,color) {
+  particles.push({x,y,tx,ty,color,progress:0,speed:0.008+Math.random()*0.006});
+}
+function updateParticles() {
+  for(let i=particles.length-1;i>=0;i--) {
+    const p=particles[i]; p.progress+=p.speed*speedMul;
+    if(p.progress>=1) { particles.splice(i,1); continue; }
+    p.x=lerp(p.x,p.tx,p.speed*speedMul*2);
+    p.y=lerp(p.y,p.ty,p.speed*speedMul*2);
+  }
+}
+function drawParticles() {
+  for(const p of particles) {
+    const a=1-p.progress;
+    ctx.save(); ctx.globalAlpha=a;
+    ctx.fillStyle=p.color; ctx.beginPath(); ctx.arc(p.x,p.y,3.5,0,Math.PI*2); ctx.fill();
+    glow(p.x,p.y,14,p.color,a*0.4);
+    ctx.restore();
+  }
+}
+function lerp(a,b,t){return a+(b-a)*t;}
+
+// ─── DNA helix drawing ───
+function drawHelix(cx,cy,w,h,phase) {
+  const n=40;
+  ctx.lineWidth=2.5;
+  // strand 1
+  ctx.beginPath(); ctx.strokeStyle='#66bb6a';
+  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy+Math.sin(f*Math.PI*4+phase)*h/2; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+  // strand 2
+  ctx.beginPath(); ctx.strokeStyle='#42a5f5';
+  for(let i=0;i<=n;i++){const f=i/n; const x=cx-w/2+f*w; const y=cy-Math.sin(f*Math.PI*4+phase)*h/2; if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);}
+  ctx.stroke();
+  // rungs
+  ctx.lineWidth=1; ctx.strokeStyle='rgba(255,255,255,0.12)';
+  for(let i=2;i<n;i+=3){const f=i/n; const x=cx-w/2+f*w; const y1=cy+Math.sin(f*Math.PI*4+phase)*h/2; const y2=cy-Math.sin(f*Math.PI*4+phase)*h/2; ctx.beginPath();ctx.moveTo(x,y1);ctx.lineTo(x,y2);ctx.stroke();}
+}
+
+// ─── Nucleotide boxes ───
+const DNA_SEQ = 'ATGCCTAGNNTCGAAATGCGTACGTACGATCGATCG';
+const NUC_COL = {A:'#66bb6a',T:'#42a5f5',G:'#ffa726',C:'#ce93d8',N:'#666'};
+
+function drawNucBoxes(cx,cy,count,phase,showIds) {
+  const bw=38,bh=36,gap=4; const total=(bw+gap)*count-gap;
+  const sx=cx-total/2;
+  for(let i=0;i<count;i++){
+    const ch=DNA_SEQ[i%DNA_SEQ.length];
+    const x=sx+i*(bw+gap); const y=cy;
+    const a=Math.max(0,Math.min(1,(phase-i*0.07)*2));
+    if(a<=0)continue;
+    ctx.save(); ctx.globalAlpha=a;
+    const col=NUC_COL[ch]||'#888';
+    roundRect(x,y,bw,bh,6,col+'22',col);
+    txt(ch,x+bw/2,y+bh/2-(showIds?5:0),col,16);
+    if(showIds) txt(''+(i+1),x+bw/2,y+bh/2+12,'#6a7a9a',10);
+    ctx.restore();
+  }
+  return {x:sx,y:cy,w:total,h:bh};
+}
+
+// ─── Embedding vector viz ───
+function drawEmbedVectors(cx,cy,count,phase) {
+  const bw=38,gap=4,vh=80; const total=(bw+gap)*count-gap; const sx=cx-total/2;
+  for(let i=0;i<count;i++){
+    const a=Math.max(0,Math.min(1,(phase-i*0.1)*2));
+    if(a<=0)continue;
+    ctx.save(); ctx.globalAlpha=a;
+    const x=sx+i*(bw+gap);
+    roundRect(x,cy,bw,vh,5,COL.embed+'18',COL.embed+'66');
+    // mini bars inside
+    for(let j=0;j<6;j++){
+      const bh2=10+Math.sin(i*3+j*1.7+phase*2)*12;
+      const bx=x+5+j*5; const by=cy+vh-6-Math.abs(bh2);
+      ctx.fillStyle=COL.embed+'88'; ctx.fillRect(bx,by,3.5,Math.abs(bh2));
+    }
+    txt('4096d',x+bw/2,cy+vh+12,COL.dim,9);
+    ctx.restore();
+  }
+}
+
+// ─── Hyena operator block ───
+function drawHyenaBlock(cx,cy,w,h,label,filterLen,color,phase) {
+  const a = Math.min(1, phase * 1.5);
+  ctx.save(); ctx.globalAlpha = a;
+
+  // main box
+  roundRect(cx-w/2, cy-h/2, w, h, 10, color+'14', color);
+  txt(label, cx, cy-h/2+20, color, 14, 'center');
+
+  // internal flow: three projections
+  const pw=50, ph=24, py=cy-10;
+  const labels3 = ['x\u2081 gate','x\u2082 gate','v value'];
+  for(let i=0;i<3;i++){
+    const px = cx-70+i*70;
+    roundRect(px-pw/2, py-ph/2, pw, ph, 5, color+'22', color+'66');
+    txt(labels3[i], px, py, '#c0c8d8', 9);
+  }
+
+  // FFT convolution vis
+  const fy=cy+30;
+  txt('FFT Conv (filter ~'+filterLen+')', cx, fy, color, 11);
+  // sine wave representing filter
+  ctx.beginPath(); ctx.strokeStyle=color; ctx.lineWidth=1.8;
+  for(let i=0;i<60;i++){
+    const x=cx-30+i; const y=fy+14+Math.sin(i*0.3+phase*4)*6*Math.exp(-i*0.02);
+    i===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // gating symbols
+  const gy=cy+55;
+  txt('gate \u2297 conv \u2297 gate \u2192 out', cx, gy, COL.dim, 10);
+
+  ctx.restore();
+}
+
+// ─── Attention block ───
+function drawAttnBlock(cx,cy,w,h,phase) {
+  const a=Math.min(1,phase*1.5);
+  ctx.save(); ctx.globalAlpha=a;
+  roundRect(cx-w/2,cy-h/2,w,h,10,COL.attn+'14',COL.attn);
+  txt('Multi-Head Attention',cx,cy-h/2+20,COL.attn,14);
+
+  // QKV
+  const qy=cy-5;
+  ['Q','K','V'].forEach((l,i)=>{
+    const px=cx-50+i*50;
+    roundRect(px-18,qy-12,36,24,5,COL.attn+'22',COL.attn+'66');
+    txt(l,px,qy,'#d0c0e8',11);
+  });
+
+  // attention matrix mini-vis
+  const my=cy+30; const ms=30;
+  ctx.strokeStyle=COL.attn+'44'; ctx.lineWidth=0.8;
+  for(let r=0;r<5;r++) for(let c=0;c<5;c++){
+    const v=Math.sin(r*c+phase*3)*0.5+0.5;
+    ctx.fillStyle=`rgba(206,147,216,${v*0.5})`;
+    ctx.fillRect(cx-ms/2+c*6, my-ms/2+r*6, 5, 5);
+  }
+  txt('Attn Matrix', cx, my+ms/2+10, COL.dim, 9);
+
+  // RoPE label
+  txt('+ RoPE positional encoding', cx, cy+h/2-14, COL.dim, 9);
+
+  ctx.restore();
+}
+
+// ─── MLP block ───
+function drawMLPBlock(cx,cy,w,h,phase) {
+  const a=Math.min(1,phase*1.5);
+  ctx.save(); ctx.globalAlpha=a;
+  roundRect(cx-w/2,cy-h/2,w,h,8,COL.mlp+'14',COL.mlp+'66');
+  txt('MLP (GatedLinear + GELU)',cx,cy-6,COL.mlp,11);
+  txt('4096 \u2192 11008 \u2192 4096',cx,cy+10,COL.dim,9);
+  ctx.restore();
+}
+
+// ─── Residual arrow ───
+function drawResArrow(x1,y1,x2,y2,phase) {
+  const a=Math.min(1,phase*2)*0.6;
+  ctx.save(); ctx.globalAlpha=a;
+  ctx.setLineDash([5,5]); ctx.strokeStyle=COL.res; ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();
+  ctx.setLineDash([]);
+  txt('+',x2+12,(y1+y2)/2,COL.res,14);
+  ctx.restore();
+}
+
+// ─── Layer stack tower ───
+function drawLayerTower(cx,cy,phase) {
+  const lw=92, lh=16, gap=3;
+  const layers = [];
+  // 32 layers for 7B
+  const layerTypes = [];
+  const attnIdx = new Set([3,10,17,24,31]);
+  const hclIdx = new Set([2,6,9,13,16,20,23,27,30]);
+  const hcmIdx = new Set([1,5,8,12,15,19,22,26,29]);
+  for(let i=0;i<32;i++){
+    if(attnIdx.has(i)) layerTypes.push('ATT');
+    else if(hclIdx.has(i)) layerTypes.push('HCL');
+    else if(hcmIdx.has(i)) layerTypes.push('HCS');  // visually labeled
+    else layerTypes.push('HCM');
+  }
+
+  const totalH = 32*(lh+gap);
+  const startY = cy - totalH/2;
+
+  for(let i=0;i<32;i++){
+    const y = startY + i*(lh+gap);
+    const p = Math.max(0, Math.min(1, (phase - i*0.03)*2));
+    if(p<=0)continue;
+    ctx.save(); ctx.globalAlpha=p;
+    const tp = layerTypes[i];
+    let col = COL.hyena;
+    if(tp==='ATT') col = COL.attn;
+    else if(tp==='HCL') col = '#66bb6a';
+    else if(tp==='HCM') col = '#aed581';
+
+    roundRect(cx-lw/2, y, lw, lh, 4, col+'22', col+'88');
+    txt(tp + ' ' + i, cx, y+lh/2, col, 9);
+    ctx.restore();
+  }
+  // arrows
+  const a2 = Math.min(1,phase);
+  arrow(cx, startY-15, cx, startY-2, COL.accent, a2*0.5);
+  arrow(cx, startY+totalH+2, cx, startY+totalH+15, COL.accent, a2*0.5);
+  txt('input', cx, startY-25, COL.dim, 10);
+  txt('output', cx, startY+totalH+26, COL.dim, 10);
+}
+
+// ─── Output viz ───
+function drawOutputBar(cx,cy,phase) {
+  const nucs=['A','T','G','C'];
+  const probs=[0.05, 0.72, 0.15, 0.08]; // example
+  const bw=50, maxH=100, gap=20;
+  const total=(bw+gap)*4-gap; const sx=cx-total/2;
+  for(let i=0;i<4;i++){
+    const a=Math.max(0,Math.min(1,(phase-i*0.15)*2));
+    if(a<=0) continue;
+    ctx.save(); ctx.globalAlpha=a;
+    const x=sx+i*(bw+gap);
+    const h=probs[i]*maxH*Math.min(1,phase*1.2);
+    const col=NUC_COL[nucs[i]];
+    roundRect(x, cy-h, bw, h, 5, col+'44', col);
+    txt(nucs[i], x+bw/2, cy+16, col, 16);
+    txt((probs[i]*100).toFixed(0)+'%', x+bw/2, cy-h-14, col, 12);
+    ctx.restore();
+  }
+  const a3=Math.min(1,phase*0.8);
+  txt('P(next nucleotide | context)', cx, cy+40, COL.dim, 12);
+  if(phase>0.6){ ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.6)*3); glow(sx+1*(bw+gap)+bw/2,cy-probs[1]*maxH*Math.min(1,phase*1.2)-10,40,NUC_COL['T'],0.5); txt('\u2190 Predicted: T','',0,'',0); ctx.restore(); }
+}
+
+// ─── Main draw per step ───
+function drawStep(s, phase) {
+  const cx=W/2, topY=60;
+
+  switch(s) {
+    case 0: { // DNA input
+      drawHelix(cx, topY+80, W*0.75, 60, t*0.8);
+      txt('Raw DNA Sequence', cx, topY+140, COL.dna, 15);
+      drawNucBoxes(cx, topY+170, 12, phase, false);
+      txt('...millions of nucleotides...', cx, topY+220, COL.dim, 12);
+      // arrow down
+      if(phase>0.5) arrow(cx, topY+240, cx, topY+270, COL.accent, (phase-0.5)*2);
+      break;
+    }
+    case 1: { // Tokenize
+      drawNucBoxes(cx, topY+40, 10, phase, false);
+      if(phase>0.3) arrow(cx, topY+90, cx, topY+120, COL.accent, (phase-0.3)*2);
+      // token IDs
+      if(phase>0.4) {
+        const ids=[1,4,3,2,2,4,1,3,14,14];
+        const bw=38,gap=4,count=10; const total=(bw+gap)*count-gap; const sx=cx-total/2;
+        for(let i=0;i<count;i++){
+          const a=Math.max(0,Math.min(1,(phase-0.4-i*0.05)*3));
+          if(a<=0) continue;
+          ctx.save(); ctx.globalAlpha=a;
+          const x=sx+i*(bw+gap);
+          roundRect(x,topY+140,bw,36,6,COL.token+'22',COL.token);
+          txt(''+ids[i],x+bw/2,topY+158,COL.token,15);
+          ctx.restore();
+        }
+      }
+      if(phase>0.7) {
+        txt('Vocabulary: 512 tokens | 1 nucleotide = 1 token', cx, topY+200, COL.dim, 12);
+        txt('CharLevelTokenizer — zero information loss', cx, topY+220, COL.accent, 11);
+      }
+      break;
+    }
+    case 2: { // Embedding
+      // token IDs (small)
+      const ids=[1,4,3,2,2,4,1,3];
+      const bw=30,gap=3,count=8; const total=(bw+gap)*count-gap; const sx=cx-total/2;
+      for(let i=0;i<count;i++){
+        ctx.save(); ctx.globalAlpha=0.6;
+        const x=sx+i*(bw+gap);
+        roundRect(x,topY+20,bw,28,5,COL.token+'18',COL.token+'66');
+        txt(''+ids[i],x+bw/2,topY+34,COL.token,11);
+        ctx.restore();
+      }
+      if(phase>0.2) arrow(cx, topY+60, cx, topY+85, COL.accent, Math.min(1,(phase-0.2)*3));
+      // embedding vectors
+      if(phase>0.3) drawEmbedVectors(cx, topY+100, 8, phase-0.3);
+      if(phase>0.6) {
+        txt('Embedding lookup table: 512 \u2192 4096-dim dense vectors', cx, topY+210, COL.dim, 12);
+        txt('[batch, seq_len, 4096]', cx, topY+230, COL.embed, 12);
+      }
+      break;
+    }
+    case 3: { // HCS
+      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Short Conv (HCS)', '7 bp', COL.hyena, phase);
+      if(phase>0.2) { txt('Captures: dinucleotides, codon boundaries, tiny motifs', cx, topY+280, COL.dim, 11); }
+      if(phase>0.5) {
+        // show short filter wave
+        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
+        txt('Short receptive field (~7 bp)', cx, topY+310, COL.hyena, 12);
+        // draw short bar
+        const bx=cx-3.5*12; for(let i=0;i<7;i++){
+          ctx.fillStyle=COL.hyena+'66'; roundRect(bx+i*12, topY+330, 10, 20, 3, COL.hyena+'33', COL.hyena);
+        }
+        ctx.restore();
+      }
+      break;
+    }
+    case 4: { // HCM
+      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Medium Conv (HCM)', '~128 bp', '#aed581', phase);
+      if(phase>0.2) txt('Captures: promoters, RBS, TATA boxes, regulatory regions', cx, topY+280, COL.dim, 11);
+      if(phase>0.5) {
+        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
+        txt('Medium receptive field (~128 bp)', cx, topY+310, '#aed581', 12);
+        const bx=cx-20*5; for(let i=0;i<40;i++){
+          ctx.fillStyle='#aed581'+'44';
+          ctx.fillRect(bx+i*5, topY+330, 4, 16);
+        }
+        ctx.restore();
+      }
+      break;
+    }
+    case 5: { // HCL
+      drawHyenaBlock(cx, topY+160, 340, 160, 'Hyena Long Conv (HCL)', 'full seq (1M bp)', '#66bb6a', phase);
+      if(phase>0.2) txt('Captures: operons, gene neighborhoods, chromosome-scale patterns', cx, topY+280, COL.dim, 11);
+      if(phase>0.5) {
+        ctx.save(); ctx.globalAlpha=Math.min(1,(phase-0.5)*2);
+        txt('Full-length receptive field (up to 1,000,000 bp)', cx, topY+310, '#66bb6a', 12);
+        // long bar
+        ctx.fillStyle='#66bb6a22';
+        roundRect(cx-W*0.38, topY+328, W*0.76, 18, 4, '#66bb6a22', '#66bb6a88');
+        txt('FFT-based O(L log L) — not O(L\u00B2)', cx, topY+360, '#66bb6a', 11);
+        ctx.restore();
+      }
+      break;
+    }
+    case 6: { // Attention
+      drawAttnBlock(cx, topY+160, 340, 170, phase);
+      if(phase>0.3) {
+        txt('Only ~16% of layers (5/32) use attention', cx, topY+290, COL.dim, 11);
+        txt('Grouped-Query Attention + RoPE + Flash Attention v2', cx, topY+310, COL.attn, 11);
+      }
+      if(phase>0.6) {
+        txt('Provides exact global pairwise interactions', cx, topY+340, COL.dim, 11);
+      }
+      break;
+    }
+    case 7: { // Pattern - layer tower
+      // Draw the tower on left
+      drawLayerTower(cx-260, topY+320, phase);
+
+      // Draw the pattern explanation on right
+      const rx=cx+100, ry=topY+80;
+      const pattern = [
+        {label:'HCS (short conv)',  col:COL.hyena},
+        {label:'HCM (medium conv)', col:'#aed581'},
+        {label:'HCL (long conv)',   col:'#66bb6a'},
+        {label:'Attention',         col:COL.attn},
+      ];
+      txt('Repeating Motif:', rx, ry, COL.accent, 14);
+      for(let i=0;i<4;i++){
+        const a=Math.max(0,Math.min(1,(phase-i*0.15)*2));
+        if(a<=0) continue;
+        ctx.save(); ctx.globalAlpha=a;
+        const y=ry+30+i*50;
+        roundRect(rx-90,y-16,180,32,6,pattern[i].col+'18',pattern[i].col);
+        txt(pattern[i].label,rx,y,pattern[i].col,12);
+        if(i<3) arrow(rx, y+18, rx, y+30, COL.accent, a*0.5);
+        ctx.restore();
+      }
+
+      // MLP + Residual note
+      if(phase>0.5) {
+        const ny=ry+250;
+        drawMLPBlock(rx, ny, 180, 40, phase-0.5);
+        if(phase>0.6) drawResArrow(rx+100, ry+30, rx+100, ry+230, phase-0.6);
+        if(phase>0.7) txt('Each layer: Mixer + MLP + Residuals', rx, ny+40, COL.dim, 10);
+      }
+
+      // Multi-scale label
+      if(phase>0.8) {
+        txt('Multi-scale hierarchy:', rx, ry+320, COL.accent, 12);
+        txt('local \u2192 medium \u2192 global \u2192 exact pairwise', rx, ry+340, COL.dim, 11);
+      }
+      break;
+    }
+    case 8: { // Output
+      // small layer stack
+      txt('32 layers processed...', cx, topY+30, COL.dim, 12);
+      if(phase>0.1){
+        roundRect(cx-80,topY+45,160,30,6,COL.accent+'14',COL.accent+'44');
+        txt('Final RMSNorm', cx, topY+60, COL.accent, 12);
+      }
+      if(phase>0.3) arrow(cx, topY+80, cx, topY+105, COL.accent, Math.min(1,(phase-0.3)*3));
+      if(phase>0.4){
+        roundRect(cx-100,topY+110,200,35,6,COL.output+'14',COL.output+'66');
+        txt('Output Projection: 4096 \u2192 512', cx, topY+128, COL.output, 12);
+      }
+      if(phase>0.55) arrow(cx, topY+150, cx, topY+175, COL.accent, Math.min(1,(phase-0.55)*3));
+      if(phase>0.6){
+        roundRect(cx-60,topY+180,120,30,6,'#fff1','#fff3');
+        txt('Softmax', cx, topY+195, '#fff', 12);
+      }
+      if(phase>0.7) arrow(cx, topY+215, cx, topY+245, COL.accent, Math.min(1,(phase-0.7)*3));
+      if(phase>0.75) drawOutputBar(cx, topY+380, phase-0.75);
+      break;
+    }
+    case 9: { // Predict & generate
+      // scoring path
+      const ly=topY+40;
+      txt('Two modes of operation:', cx, ly, COL.accent, 15);
+
+      // Left: Scoring
+      const lx=cx-180;
+      if(phase>0.1) {
+        roundRect(lx-110,ly+30,220,200,10,'#1a2a3a',COL.accent+'44');
+        txt('Scoring / Evaluation', lx, ly+50, COL.accent, 13);
+        if(phase>0.2) txt('Feed sequence \u2192 get log-likelihood', lx, ly+80, COL.dim, 10);
+        if(phase>0.3) txt('Zero-shot variant effect prediction:', lx, ly+110, COL.text, 10);
+        if(phase>0.4) {
+          txt('WT: ATGCCTAG  \u2192 LL = -2.1', lx, ly+135, COL.hyena, 10);
+          txt('Mut: ATGCCAAG  \u2192 LL = -4.7', lx, ly+155, COL.res, 10);
+          txt('\u0394LL = -2.6 \u2192 Deleterious!', lx, ly+180, COL.output, 10);
+        }
+      }
+
+      // Right: Generation
+      const rx2=cx+180;
+      if(phase>0.2) {
+        roundRect(rx2-110,ly+30,220,200,10,'#1a2a3a',COL.hyena+'44');
+        txt('Autoregressive Generation', rx2, ly+50, COL.hyena, 13);
+        if(phase>0.3) txt('Sample next nucleotide \u2192 append \u2192 repeat', rx2, ly+80, COL.dim, 10);
+        if(phase>0.4) {
+          // show growing sequence
+          const seq='ATGCCTAG';
+          const generated='GCTA';
+          const py2=ly+110;
+          for(let i=0;i<seq.length;i++){
+            const ch=seq[i]; const col=NUC_COL[ch];
+            ctx.save(); ctx.globalAlpha=0.5;
+            roundRect(rx2-90+i*22, py2, 20, 22, 3, col+'22', col+'66');
+            txt(ch, rx2-90+i*22+10, py2+11, col, 10);
+            ctx.restore();
+          }
+          for(let i=0;i<generated.length;i++){
+            const a=Math.max(0,Math.min(1,(phase-0.5-i*0.1)*3));
+            if(a<=0)continue;
+            const ch=generated[i]; const col=NUC_COL[ch];
+            ctx.save(); ctx.globalAlpha=a;
+            roundRect(rx2-90+(seq.length+i)*22, py2, 20, 22, 3, col+'44', col);
+            txt(ch, rx2-90+(seq.length+i)*22+10, py2+11, col, 11);
+            glow(rx2-90+(seq.length+i)*22+10, py2+11, 15, col, 0.4);
+            ctx.restore();
+          }
+        }
+        if(phase>0.6) {
+          txt('Hyena layers: O(1) memory per step', rx2, ly+160, COL.hyena, 10);
+          txt('(state-space model equivalence)', rx2, ly+178, COL.dim, 9);
+          txt('Attention layers: KV cache (only 16%)', rx2, ly+198, COL.attn, 10);
+        }
+      }
+
+      // Bottom summary
+      if(phase>0.7) {
+        const by=ly+260;
+        roundRect(cx-220,by,440,60,10,'#111828','#243050');
+        txt('Evo 2: The largest genomic foundation model', cx, by+18, COL.accent, 13);
+        txt('8.8T tokens \u00B7 40B params \u00B7 1M context \u00B7 All domains of life', cx, by+40, COL.dim, 11);
+      }
+      break;
+    }
+  }
+}
+
+// ─── Background grid ───
+function drawBG() {
+  ctx.fillStyle = COL.bg;
+  ctx.fillRect(0, 0, W, H);
+  ctx.strokeStyle = '#141c30';
+  ctx.lineWidth = 0.5;
+  for(let x=0;x<W;x+=40){ ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke(); }
+  for(let y=0;y<H;y+=40){ ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke(); }
+}
+
+// ─── Step progress indicator ───
+function drawProgress() {
+  const pw=10, gap=6, total=STEPS.length;
+  const tw=(pw+gap)*total-gap; const sx=W/2-tw/2;
+  for(let i=0;i<total;i++){
+    const x=sx+i*(pw+gap); const y=H-20;
+    ctx.fillStyle = i===step ? COL.accent : (i<step ? COL.accent+'44' : '#1e2a44');
+    ctx.beginPath(); ctx.arc(x+pw/2,y,pw/2,0,Math.PI*2); ctx.fill();
+  }
+  if(step>=0) txt(`${step+1}/${STEPS.length}`, W/2, H-36, COL.dim, 10);
+}
+
+// ─── Main loop ───
+function draw() {
+  drawBG();
+
+  if(step >= 0) {
+    const phase = Math.min(t * 0.012 * speedMul, 1.5);
+    drawStep(step, phase);
+  } else {
+    // Splash
+    drawHelix(W/2, H/2-60, W*0.6, 80, t*0.6);
+    txt('Evo 2', W/2, H/2+30, COL.accent, 28);
+    txt('Genomic Foundation Model', W/2, H/2+58, COL.dim, 14);
+    txt('Press Play or Next to begin', W/2, H/2+90, COL.dim+'88', 12);
+  }
+
+  drawProgress();
+  updateParticles();
+  drawParticles();
+}
+
+let lastTime = 0;
+function loop(ts) {
+  const dt = ts - lastTime; lastTime = ts;
+  if(playing || step>=0) t += dt * 0.016 * speedMul;
+  if(playing && step>=0) {
+    autoAdvance += dt * 0.001 * speedMul;
+    if(autoAdvance > 8 && step < STEPS.length-1) advance();
+  }
+  draw();
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
