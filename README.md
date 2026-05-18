@@ -8,7 +8,9 @@ Provide an accessible, visual platform for researchers, students, and practition
 
 ## Live Demo
 
-Open `index.html` in your browser to access the platform. No dependencies or build steps required.
+**https://leran10.github.io/bioinformatics-AI-model-animations/**
+
+Or clone the repo and open `index.html` in your browser. No dependencies or build steps required.
 
 ## Models Covered
 
