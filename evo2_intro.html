@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evo 2 — Architecture Primer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#06080f; color:#d0d8e8; font-family:'Inter',system-ui,sans-serif; line-height:1.7; }
+
+  /* ── Nav ── */
+  .top-nav { display:flex; justify-content:space-between; align-items:center; padding:16px 28px; border-bottom:1px solid #111828; }
+  .top-nav a { color:#4fc3f7; text-decoration:none; font-size:.9rem; }
+  .top-nav a:hover { text-decoration:underline; }
+
+  /* ── Hero ── */
+  .hero { text-align:center; padding:50px 24px 30px; position:relative; overflow:hidden; }
+  .hero::before { content:''; position:absolute; top:-100px; left:50%; transform:translateX(-50%); width:600px; height:600px;
+    background:radial-gradient(circle, #4fc3f708 0%, transparent 70%); pointer-events:none; }
+  .hero h1 { font-size:2.8rem; font-weight:800; letter-spacing:-1px;
+    background:linear-gradient(135deg,#4fc3f7,#81c784); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero .subtitle { color:#6b7fa0; font-size:1.1rem; margin-top:8px; max-width:650px; margin-left:auto; margin-right:auto; }
+  .hero .model-badges { display:flex; justify-content:center; gap:10px; margin-top:18px; flex-wrap:wrap; }
+  .hero .mbadge { font-size:.78rem; padding:5px 14px; border-radius:8px; font-weight:600; }
+
+  /* ── Section ── */
+  .section { max-width:860px; margin:0 auto; padding:40px 24px; }
+  .section h2 { font-size:1.5rem; font-weight:700; margin-bottom:6px; }
+  .section h2 .num { color:#4fc3f7; margin-right:8px; }
+  .section h3 { font-size:1.1rem; font-weight:600; color:#81c784; margin:24px 0 8px; }
+  .section p { color:#9aa8c0; font-size:.95rem; margin-bottom:14px; }
+  .section .lead { font-size:1.05rem; color:#b8c4d8; }
+
+  /* ── Concept card ── */
+  .concept { background:#0c1220; border:1px solid #1a2440; border-radius:16px; padding:28px; margin:24px 0; position:relative; overflow:hidden; }
+  .concept::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; }
+  .concept.ssm::before { background:linear-gradient(90deg,#81c784,#4fc3f7); }
+  .concept.attn::before { background:linear-gradient(90deg,#ce93d8,#ab47bc); }
+  .concept.conv::before { background:linear-gradient(90deg,#66bb6a,#aed581); }
+  .concept.hybrid::before { background:linear-gradient(90deg,#4fc3f7,#ce93d8,#81c784); }
+  .concept h3 { margin-top:0; font-size:1.2rem; }
+  .concept p { color:#8a98b4; }
+
+  /* ── Diagram canvas ── */
+  .diagram { margin:20px 0; border-radius:12px; overflow:hidden; background:#0a0e18; border:1px solid #141c2e; }
+  .diagram canvas { display:block; width:100%; }
+
+  /* ── Analogy ── */
+  .analogy { background:#0f1a2e; border-left:3px solid #ffa726; border-radius:0 8px 8px 0; padding:14px 18px; margin:16px 0; font-size:.9rem; color:#d4c8a8; }
+  .analogy b { color:#ffa726; }
+
+  /* ── Key point ── */
+  .key-point { background:#81c78410; border:1px solid #81c78430; border-radius:8px; padding:12px 16px; margin:14px 0; font-size:.9rem; color:#a8d8a0; }
+  .key-point b { color:#81c784; }
+
+  /* ── Comparison table ── */
+  .cmp-table { width:100%; border-collapse:collapse; margin:16px 0; font-size:.88rem; }
+  .cmp-table th { background:#111828; color:#4fc3f7; padding:10px 14px; text-align:left; font-weight:600; border-bottom:2px solid #1e2a44; }
+  .cmp-table td { padding:10px 14px; border-bottom:1px solid #141c2e; color:#8a98b4; }
+  .cmp-table tr:hover td { background:#0c121e; }
+
+  /* ── CTA ── */
+  .cta { text-align:center; padding:40px 24px 60px; }
+  .cta-btn { display:inline-flex; align-items:center; gap:10px; padding:16px 36px; background:linear-gradient(135deg,#4fc3f7,#81c784);
+    color:#06080f; font-size:1.1rem; font-weight:700; border-radius:12px; text-decoration:none; transition:.3s;
+    box-shadow:0 4px 20px #4fc3f733; }
+  .cta-btn:hover { transform:translateY(-2px); box-shadow:0 8px 30px #4fc3f744; }
+  .cta-btn svg { width:20px; height:20px; }
+  .cta-sub { color:#5a6a88; font-size:.85rem; margin-top:12px; }
+
+  /* ── Divider ── */
+  .divider { border:none; border-top:1px solid #111828; margin:0; }
+
+  /* ── Responsive ── */
+  @media(max-width:700px) {
+    .hero h1 { font-size:2rem; }
+    .section { padding:28px 16px; }
+    .concept { padding:20px; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="index.html">&larr; All Models</a>
+  <a href="evo2_animation.html">Skip to Animation &rarr;</a>
+</nav>
+
+<div class="hero">
+  <h1>Evo 2</h1>
+  <div class="subtitle">Before we dive into how Evo 2 processes DNA step-by-step, let's understand the AI building blocks it uses. No prior machine learning knowledge required.</div>
+  <div class="model-badges">
+    <span class="mbadge" style="background:#81c78422;border:1px solid #81c784;color:#a5d6a7">SSM / Hyena</span>
+    <span class="mbadge" style="background:#ab47bc22;border:1px solid #ab47bc;color:#ce93d8">Transformer (Attention)</span>
+    <span class="mbadge" style="background:#66bb6a22;border:1px solid #66bb6a;color:#a5d6a7">Convolution</span>
+    <span class="mbadge" style="background:#ffa72622;border:1px solid #ffa726;color:#ffcc80">Hybrid Architecture</span>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 0: What is a neural network?        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">0.</span> First — What is a Neural Network?</h2>
+  <p class="lead">Every AI model in this guide is built from <b>neural networks</b> — programs that learn patterns from data, inspired (loosely) by how brain neurons connect.</p>
+
+  <div class="concept">
+    <h3 style="color:#4fc3f7">The Core Idea</h3>
+    <p>A neural network takes an input (like a DNA sequence), passes it through layers of simple math operations, and produces an output (like "the next letter is probably T"). Each layer transforms the data a little, extracting increasingly complex patterns.</p>
+    <p>The magic: the network <b>learns</b> what transformations to apply by seeing billions of examples during training. It adjusts its internal numbers (called <b>weights</b> — there are billions of them) until it gets good at the task.</p>
+
+    <div class="diagram">
+      <canvas id="nnDiagram" height="200"></canvas>
+    </div>
+
+    <div class="analogy"><b>Analogy:</b> Think of a neural network like a factory assembly line. Raw materials (DNA letters) enter at one end. Each workstation (layer) performs a specific operation — checking for patterns, combining information, making decisions. The product that comes out the other end is the prediction. The factory learns to configure each workstation by practicing on millions of examples.</div>
+  </div>
+
+  <div class="key-point"><b>Key idea:</b> All the architectures below (Transformers, SSMs, CNNs) are just different designs for these "workstations" — different ways to process and transform data at each layer. The question is always: what's the best way to look at the input data?</div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 1: Convolution                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">1.</span> Convolution — Sliding a Window to Find Patterns</h2>
+  <p class="lead">Convolution is the oldest and simplest technique Evo 2 uses. It's the backbone of CNNs (Convolutional Neural Networks), used in image recognition since the 1990s.</p>
+
+  <div class="concept conv">
+    <h3>How It Works</h3>
+    <p>Imagine you have a magnifying glass of a fixed size (say, 7 letters wide). You slide it across the DNA sequence, one position at a time. At each position, the magnifying glass checks: "Does the pattern under me match something important?"</p>
+    <p>The "magnifying glass" is called a <b>filter</b> (or kernel). It's a small set of learned numbers that detect a specific pattern. Multiple filters run in parallel, each looking for a different pattern.</p>
+
+    <div class="diagram">
+      <canvas id="convDiagram" height="180"></canvas>
+    </div>
+
+    <div class="analogy"><b>Analogy:</b> Like a spell-checker that slides across your text, checking each word against its dictionary. It can only see a few characters at a time — it catches typos in "teh" but can't tell if your overall essay makes sense.</div>
+
+    <div class="key-point"><b>Strength:</b> Very fast and efficient. Great at finding local patterns (codons, motifs).<br><b>Weakness:</b> A small window can't see long-range relationships. A 7-letter filter can never detect that a gene 10,000 letters away is related.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: Attention / Transformer          -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">2.</span> Attention — Letting Every Position Talk to Every Other</h2>
+  <p class="lead">The <b>Transformer</b> architecture (2017) revolutionized AI. It powers ChatGPT, AlphaFold, DNABERT, and most modern AI models. Its core innovation: <b>attention</b>.</p>
+
+  <div class="concept attn">
+    <h3>How It Works</h3>
+    <p>Instead of sliding a small window, attention lets <b>every position in the sequence look at every other position</b> and decide which ones are most relevant. For each position, it computes a "relevance score" with all other positions, then uses those scores to gather information.</p>
+    <p>This happens through three learned projections — called <b>Query</b> (what am I looking for?), <b>Key</b> (what do I contain?), and <b>Value</b> (what information do I carry?). Each position's Query is compared against all Keys to produce attention scores, then those scores weight the Values to produce the output.</p>
+
+    <div class="diagram">
+      <canvas id="attnDiagram" height="240"></canvas>
+    </div>
+
+    <p><b>Multi-head</b> attention runs this process multiple times in parallel (e.g., 32 "heads"), each looking for different types of relationships. One head might focus on nearby letters, another on distant regulatory elements.</p>
+
+    <div class="analogy"><b>Analogy:</b> Imagine a classroom discussion where every student can hear every other student simultaneously. Each student (position) decides who's saying the most relevant things (attention scores) and takes notes accordingly. "Multi-head" means multiple parallel discussions happening at once, each on a different topic.</div>
+
+    <div class="key-point"><b>Strength:</b> Can capture relationships between ANY two positions, no matter how far apart. This is why it's so powerful for understanding language and biology.<br><b>Weakness:</b> Comparing every position to every other position costs O(n&sup2;) — quadratic. For a 1-million-letter genome, that's 1 trillion comparisons per layer. Very expensive!</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 3: State-Space Models               -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">3.</span> State-Space Models (SSM) — Remembering As You Read</h2>
+  <p class="lead">SSMs (including <b>Mamba</b> and <b>Hyena</b>) are the newest architecture family (2023-2024). They're designed to handle very long sequences efficiently — exactly what genomics needs.</p>
+
+  <div class="concept ssm">
+    <h3>How It Works</h3>
+    <p>An SSM processes the sequence <b>one element at a time</b>, maintaining a compact "memory" (called the <b>state</b>) that summarizes everything it has seen so far. At each step, it updates this memory based on the new input, then uses the memory to produce an output.</p>
+    <p>The key insight: this is mathematically equivalent to a <b>very long convolution</b>, but computed much more efficiently. Instead of storing a filter the size of the entire sequence, it uses a compact recurrence formula.</p>
+
+    <div class="diagram">
+      <canvas id="ssmDiagram" height="200"></canvas>
+    </div>
+
+    <p><b>Hyena</b> (used in Evo 2) adds <b>data-dependent gating</b> — the input itself controls how information flows through the system. This makes it more expressive than a simple SSM while keeping the efficiency.</p>
+
+    <div class="analogy"><b>Analogy:</b> Think of reading a novel and keeping a mental summary as you go. You don't remember every word you've read, but you maintain a compressed understanding. When you read "the detective revealed the killer was the butler," your mental state updates dramatically. SSMs work the same way — a compact state that evolves as it processes each position.</div>
+
+    <div class="key-point"><b>Strength:</b> Processes sequences in O(n log n) time — much faster than attention's O(n&sup2;). Can handle 1M+ positions. During generation, uses O(1) memory per step (no growing cache).<br><b>Weakness:</b> The compressed state can't perfectly represent all pairwise relationships the way attention can. Some long-range interactions may be missed.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 4: Why Evo 2 is Hybrid             -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">4.</span> Why Evo 2 Combines Them — The Hybrid Approach</h2>
+  <p class="lead">Now you understand the trade-offs. Evo 2's insight: <b>use each technique where it's strongest</b>.</p>
+
+  <div class="concept hybrid">
+    <h3>The StripedHyena-2 Recipe</h3>
+
+    <table class="cmp-table">
+      <thead>
+        <tr><th>Layer Type</th><th>What It Does</th><th>% of Layers</th><th>Speed</th></tr>
+      </thead>
+      <tbody>
+        <tr><td style="color:#81c784">Hyena Short Conv</td><td>Detects tiny local patterns (~7 letters): codons, dinucleotides</td><td>28%</td><td>Very fast</td></tr>
+        <tr><td style="color:#aed581">Hyena Medium Conv</td><td>Detects promoters, regulatory regions (~128 letters)</td><td>28%</td><td>Fast</td></tr>
+        <tr><td style="color:#66bb6a">Hyena Long Conv</td><td>Captures chromosome-scale patterns (full sequence)</td><td>28%</td><td>Fast (FFT)</td></tr>
+        <tr><td style="color:#ce93d8">Attention</td><td>Exact global comparisons between all positions</td><td>16%</td><td>Slower (O(n&sup2;))</td></tr>
+      </tbody>
+    </table>
+
+    <p>The layers follow a repeating cycle: <b style="color:#81c784">Short</b> &rarr; <b style="color:#aed581">Medium</b> &rarr; <b style="color:#66bb6a">Long</b> &rarr; <b style="color:#ce93d8">Attention</b>. This way:</p>
+    <ul style="color:#8a98b4; padding-left:20px; margin:12px 0;">
+      <li>~84% of computation is sub-quadratic (fast Hyena layers)</li>
+      <li>~16% is attention (expensive but precise global view)</li>
+      <li>The model gets multi-scale understanding: local &rarr; medium &rarr; global &rarr; exact pairwise</li>
+    </ul>
+
+    <div class="analogy"><b>Analogy:</b> Like editing a book. First, a copy editor checks spelling and grammar (short conv — local). Then a section editor reviews paragraph flow (medium conv). Then a structural editor checks chapter connections (long conv). Finally, a senior editor does a full cross-reference check (attention — expensive but thorough). You don't need the senior editor at every step — just occasionally for the big picture.</div>
+
+    <div class="key-point"><b>Result:</b> Evo 2 can process sequences up to <b>1 million nucleotides</b> in a single pass — something a pure Transformer model couldn't do because of the quadratic cost. This is why it can understand entire chromosomes, not just individual genes.</div>
+  </div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 5: Quick comparison                 -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">5.</span> Architecture Comparison at a Glance</h2>
+
+  <table class="cmp-table">
+    <thead>
+      <tr><th>Feature</th><th>Convolution (CNN)</th><th>Attention (Transformer)</th><th>SSM (Hyena/Mamba)</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><b>How it looks at data</b></td><td>Small sliding window</td><td>Every position vs. every other</td><td>Compact running memory</td></tr>
+      <tr><td><b>Range</b></td><td>Local only</td><td>Global (all pairs)</td><td>Global (via state)</td></tr>
+      <tr><td><b>Speed for long sequences</b></td><td>O(n) — linear</td><td>O(n&sup2;) — quadratic</td><td>O(n log n) — near-linear</td></tr>
+      <tr><td><b>1M sequence feasible?</b></td><td>Yes (but only local)</td><td>No (too expensive)</td><td>Yes</td></tr>
+      <tr><td><b>Precision of interactions</b></td><td>High (local)</td><td>Highest (exact pairwise)</td><td>Good (compressed)</td></tr>
+      <tr><td><b>Examples in bioinformatics</b></td><td>DeepSEA, Basset</td><td>AlphaFold, ESM, DNABERT</td><td>Evo 2, Caduceus</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- CTA: Go to animation                        -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="cta">
+  <p style="color:#6b7fa0; font-size:1rem; margin-bottom:20px;">Now that you understand the building blocks, let's see them in action!</p>
+  <a class="cta-btn" href="evo2_animation.html">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+    Start the Evo 2 Animation
+  </a>
+  <div class="cta-sub">Interactive step-by-step walkthrough of how Evo 2 processes DNA</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- Animated diagrams                           -->
+<!-- ═══════════════════════════════════════════ -->
+<script>
+// ─── Shared helpers ───
+function setupCanvas(id) {
+  const c = document.getElementById(id);
+  const dpr = window.devicePixelRatio || 1;
+  const rect = c.getBoundingClientRect();
+  const w = rect.width || 800;
+  const h = c.height;
+  c.width = w * dpr; c.height = h * dpr;
+  c.style.width = w + 'px'; c.style.height = h + 'px';
+  const ctx = c.getContext('2d');
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return {ctx, w, h};
+}
+
+function txt(ctx,str,x,y,color,size,align) {
+  ctx.fillStyle=color||'#c8d0e0'; ctx.font=`${size||12}px Inter,system-ui,sans-serif`; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
+}
+function txtB(ctx,str,x,y,color,size,align) {
+  ctx.fillStyle=color||'#c8d0e0'; ctx.font=`bold ${size||12}px Inter,system-ui,sans-serif`; ctx.textAlign=align||'center'; ctx.textBaseline='middle'; ctx.fillText(str,x,y);
+}
+
+// ─── Neural Network Diagram ───
+function drawNN() {
+  const {ctx,w,h} = setupCanvas('nnDiagram');
+  ctx.fillStyle='#0a0e18'; ctx.fillRect(0,0,w,h);
+
+  const layers = [
+    {n:4, label:'Input', sublabel:'DNA letters', color:'#66bb6a'},
+    {n:6, label:'Layer 1', sublabel:'Find patterns', color:'#4fc3f7'},
+    {n:6, label:'Layer 2', sublabel:'Combine', color:'#4fc3f7'},
+    {n:6, label:'Layer ...', sublabel:'Deeper features', color:'#4fc3f7'},
+    {n:4, label:'Output', sublabel:'Predictions', color:'#ffa726'},
+  ];
+  const lx = layers.map((_,i) => 80 + i * ((w-160) / (layers.length-1)));
+
+  // Draw connections
+  for(let l=0; l<layers.length-1; l++) {
+    for(let i=0; i<layers[l].n; i++) {
+      for(let j=0; j<layers[l+1].n; j++) {
+        const y1 = 40 + i * ((h-100) / (layers[l].n-1));
+        const y2 = 40 + j * ((h-100) / (layers[l+1].n-1));
+        ctx.strokeStyle = '#1e2a4433';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(lx[l], y1); ctx.lineTo(lx[l+1], y2); ctx.stroke();
+      }
+    }
+  }
+
+  // Draw nodes
+  for(let l=0; l<layers.length; l++) {
+    for(let i=0; i<layers[l].n; i++) {
+      const y = 40 + i * ((h-100) / (layers[l].n-1));
+      ctx.fillStyle = '#0a0e18';
+      ctx.beginPath(); ctx.arc(lx[l], y, 12, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = layers[l].color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(lx[l], y, 12, 0, Math.PI*2); ctx.stroke();
+      if(l===0) { txt(ctx, ['A','T','G','C'][i], lx[l], y, layers[l].color, 10); }
+      if(l===layers.length-1) { txt(ctx, ['A?','T?','G?','C?'][i], lx[l], y, layers[l].color, 8); }
+    }
+    txtB(ctx, layers[l].label, lx[l], h-18, layers[l].color, 10);
+  }
+
+  // Arrow
+  ctx.strokeStyle='#4fc3f744'; ctx.lineWidth=1.5;
+  ctx.beginPath(); ctx.moveTo(50,h/2); ctx.lineTo(w-50,h/2); ctx.stroke();
+  txt(ctx, 'Data flows left to right through layers', w/2, h-5, '#3a4a68', 9);
+}
+
+// ─── Convolution Diagram ───
+function drawConv() {
+  const {ctx,w,h} = setupCanvas('convDiagram');
+  ctx.fillStyle='#0a0e18'; ctx.fillRect(0,0,w,h);
+
+  const seq = 'A T G C C T A G N T C G A A T G C G T A'.split(' ');
+  const bw = 28, gap = 3, startX = (w - seq.length*(bw+gap)) / 2;
+  const seqY = 50;
+  const cols = {A:'#66bb6a',T:'#42a5f5',G:'#ffa726',C:'#ce93d8',N:'#666'};
+
+  // Draw sequence
+  for(let i=0; i<seq.length; i++) {
+    const x = startX + i*(bw+gap);
+    const col = cols[seq[i]] || '#666';
+    ctx.fillStyle = col + '18';
+    ctx.strokeStyle = col + '66';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x, seqY, bw, bw, 4); ctx.fill(); ctx.stroke();
+    txt(ctx, seq[i], x+bw/2, seqY+bw/2, col, 11);
+  }
+  txt(ctx, 'DNA Sequence', w/2, seqY-16, '#5a6a88', 10);
+
+  // Sliding window
+  const winSize = 7;
+  const winIdx = 5; // position of window
+  const wx = startX + winIdx*(bw+gap) - 3;
+  const ww = winSize*(bw+gap) + 3;
+  ctx.strokeStyle = '#81c784';
+  ctx.lineWidth = 2.5;
+  ctx.setLineDash([6,3]);
+  ctx.beginPath(); ctx.roundRect(wx, seqY-5, ww, bw+10, 6); ctx.stroke();
+  ctx.setLineDash([]);
+  txtB(ctx, 'Filter window (size 7)', wx+ww/2, seqY+bw+20, '#81c784', 10);
+
+  // Arrow to output
+  ctx.strokeStyle = '#81c78488'; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(wx+ww/2, seqY+bw+30); ctx.lineTo(wx+ww/2, seqY+bw+48); ctx.stroke();
+
+  // Output
+  ctx.fillStyle = '#81c78422';
+  ctx.strokeStyle = '#81c784';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.roundRect(wx+ww/2-50, seqY+bw+50, 100, 28, 6); ctx.fill(); ctx.stroke();
+  txt(ctx, '"Pattern found!"', wx+ww/2, seqY+bw+64, '#81c784', 10);
+
+  // Explanation
+  txt(ctx, 'The filter slides across the sequence, one position at a time, checking for patterns', w/2, h-12, '#3a4a68', 9);
+}
+
+// ─── Attention Diagram ───
+function drawAttn() {
+  const {ctx,w,h} = setupCanvas('attnDiagram');
+  ctx.fillStyle='#0a0e18'; ctx.fillRect(0,0,w,h);
+
+  const labels = ['A','T','G','C','C','T','A','G'];
+  const n = labels.length;
+  const spacing = 50;
+  const startX = w/2 - (n-1)*spacing/2;
+  const nodeY = 80;
+  const cols = {A:'#66bb6a',T:'#42a5f5',G:'#ffa726',C:'#ce93d8'};
+
+  txt(ctx, 'Each position computes relevance scores with ALL other positions:', w/2, 20, '#5a6a88', 10);
+
+  // Draw some attention arcs (illustrative)
+  const pairs = [[0,7,0.9],[1,5,0.8],[2,6,0.7],[3,4,0.6],[0,3,0.4],[2,5,0.5],[1,7,0.3]];
+  for(const [i,j,strength] of pairs) {
+    const x1 = startX + i*spacing, x2 = startX + j*spacing;
+    const mid = (x1+x2)/2;
+    const cp = nodeY - 20 - Math.abs(i-j)*12;
+    ctx.strokeStyle = `rgba(206,147,216,${strength*0.5})`;
+    ctx.lineWidth = strength * 3;
+    ctx.beginPath(); ctx.moveTo(x1, nodeY); ctx.quadraticCurveTo(mid, cp, x2, nodeY); ctx.stroke();
+  }
+
+  // Draw nodes
+  for(let i=0; i<n; i++) {
+    const x = startX + i*spacing;
+    const col = cols[labels[i]];
+    ctx.fillStyle = '#0a0e18';
+    ctx.beginPath(); ctx.arc(x, nodeY, 16, 0, Math.PI*2); ctx.fill();
+    ctx.strokeStyle = col; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.arc(x, nodeY, 16, 0, Math.PI*2); ctx.stroke();
+    txtB(ctx, labels[i], x, nodeY, col, 13);
+  }
+
+  // QKV explanation
+  const bx = w/2, by = 150;
+  const boxes = [
+    {label:'Query', sub:'What am I looking for?', color:'#ce93d8', x:bx-160},
+    {label:'Key', sub:'What do I contain?', color:'#ab47bc', x:bx},
+    {label:'Value', sub:'What info do I carry?', color:'#9c27b0', x:bx+160},
+  ];
+  for(const b of boxes) {
+    ctx.fillStyle = b.color + '15';
+    ctx.strokeStyle = b.color + '66';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(b.x-65, by, 130, 40, 6); ctx.fill(); ctx.stroke();
+    txtB(ctx, b.label, b.x, by+13, b.color, 11);
+    txt(ctx, b.sub, b.x, by+28, '#6b7a96', 9);
+  }
+
+  // Bottom note
+  txt(ctx, 'Score = Query * Key   |   Output = Score * Value   |   "Who should I pay attention to?"', w/2, by+60, '#3a4a68', 9);
+  txt(ctx, 'Lines show attention strength — thicker = more relevant to each other', w/2, h-10, '#3a4a68', 9);
+}
+
+// ─── SSM Diagram ───
+function drawSSM() {
+  const {ctx,w,h} = setupCanvas('ssmDiagram');
+  ctx.fillStyle='#0a0e18'; ctx.fillRect(0,0,w,h);
+
+  const seq = ['A','T','G','C','C','T','A','G'];
+  const n = seq.length;
+  const spacing = 70;
+  const startX = w/2 - (n-1)*spacing/2;
+  const inputY = 40, stateY = 100, outputY = 160;
+  const cols = {A:'#66bb6a',T:'#42a5f5',G:'#ffa726',C:'#ce93d8'};
+
+  txt(ctx, 'Input', startX-40, inputY, '#5a6a88', 9);
+  txt(ctx, 'State (memory)', startX-40, stateY, '#5a6a88', 9);
+  txt(ctx, 'Output', startX-40, outputY, '#5a6a88', 9);
+
+  for(let i=0; i<n; i++) {
+    const x = startX + i*spacing;
+    const col = cols[seq[i]];
+
+    // Input node
+    ctx.fillStyle = col + '22'; ctx.strokeStyle = col; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(x-14, inputY-14, 28, 28, 6); ctx.fill(); ctx.stroke();
+    txtB(ctx, seq[i], x, inputY, col, 12);
+
+    // Arrow input -> state
+    ctx.strokeStyle = '#4fc3f744'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, inputY+16); ctx.lineTo(x, stateY-16); ctx.stroke();
+
+    // State node (gets bigger as more info accumulated)
+    const sz = 12 + i*1.5;
+    ctx.fillStyle = '#81c784' + Math.floor(20 + i*8).toString(16).padStart(2,'0');
+    ctx.strokeStyle = '#81c784'; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.roundRect(x-sz, stateY-sz, sz*2, sz*2, 6); ctx.fill(); ctx.stroke();
+    txt(ctx, 'S'+i, x, stateY, '#81c784', 9);
+
+    // Arrow state -> state (horizontal)
+    if(i < n-1) {
+      ctx.strokeStyle = '#81c78466'; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(x+sz+2, stateY); ctx.lineTo(startX+(i+1)*spacing-12-((i+1)*1.5)-2, stateY); ctx.stroke();
+      // arrowhead
+      const ax = startX+(i+1)*spacing-12-((i+1)*1.5)-2;
+      ctx.fillStyle = '#81c78466';
+      ctx.beginPath(); ctx.moveTo(ax,stateY); ctx.lineTo(ax-6,stateY-4); ctx.lineTo(ax-6,stateY+4); ctx.closePath(); ctx.fill();
+    }
+
+    // Arrow state -> output
+    ctx.strokeStyle = '#ffa72644'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x, stateY+sz+2); ctx.lineTo(x, outputY-14); ctx.stroke();
+
+    // Output node
+    ctx.fillStyle = '#ffa72618'; ctx.strokeStyle = '#ffa726'; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.roundRect(x-14, outputY-12, 28, 24, 5); ctx.fill(); ctx.stroke();
+    txt(ctx, 'O'+i, x, outputY, '#ffa726', 9);
+  }
+
+  txt(ctx, 'State carries a compressed summary of everything seen so far (grows richer over time)', w/2, h-10, '#3a4a68', 9);
+}
+
+// ─── Draw all diagrams ───
+drawNN();
+drawConv();
+drawAttn();
+drawSSM();
+
+// Redraw on resize
+window.addEventListener('resize', () => { drawNN(); drawConv(); drawAttn(); drawSSM(); });
+</script>
+
+</body>
+</html>
