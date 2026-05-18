@@ -9,7 +9,8 @@
   body { background:#0a0e1a; color:#e0e6f0; font-family:'Segoe UI',system-ui,sans-serif; overflow-x:hidden; }
 
   /* ── Sticky header wrapper ── */
-  .sticky-header { position:sticky; top:0; z-index:100; background:#0a0e1a; border-bottom:1px solid #1a2240; transition:all .3s; }
+  .sticky-header { position:sticky; top:0; z-index:100; background:#0a0e1a; border-bottom:1px solid #1a2240;
+    will-change:transform; transform:translateZ(0); -webkit-backface-visibility:hidden; backface-visibility:hidden; }
   .sticky-header.compact header { padding:6px 20px 2px; }
   .sticky-header.compact header h1 { font-size:1.1rem; }
   .sticky-header.compact header p { max-height:0; overflow:hidden; opacity:0; margin:0; padding:0; }
@@ -19,13 +20,13 @@
   .sticky-header.compact #legend .leg span { width:10px; height:10px; }
 
   /* ── Top bar ── */
-  header { text-align:center; padding:14px 20px 4px; transition:all .3s; }
-  header h1 { font-size:1.6rem; transition:font-size .3s; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
+  header { text-align:center; padding:14px 20px 4px; }
+  header h1 { font-size:1.6rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  header p { color:#8892a8; margin-top:4px; font-size:0.85rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.4; transition:all .3s; }
+  header p { color:#8892a8; margin-top:4px; font-size:0.85rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.4; }
 
   /* ── Controls ── */
-  #controls { display:flex; justify-content:center; gap:10px; padding:6px 16px; flex-wrap:wrap; transition:all .3s; }
+  #controls { display:flex; justify-content:center; gap:10px; padding:6px 16px; flex-wrap:wrap; }
   button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:6px 16px; border-radius:8px; cursor:pointer; font-size:.82rem; transition:.2s; font-family:inherit; }
   button:hover { background:#24304e; border-color:#4fc3f7; color:#fff; }
   button.active { background:#1b2d4d; border-color:#4fc3f7; color:#4fc3f7; }
@@ -57,9 +58,9 @@
   .takeaway::before { content:'Key idea: '; font-weight:700; color:#81c784; }
 
   /* ── Legend ── */
-  #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; transition:all .3s; }
+  #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; }
   .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
-  .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; transition:all .3s; }
+  .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; }
 
   /* ── Back link ── */
   .back-link { position:absolute; top:10px; left:20px; color:#4fc3f7; text-decoration:none; font-size:.85rem; z-index:10; }
@@ -812,11 +813,13 @@ requestAnimationFrame(loop);
 
 // ─── Sticky header: compact on scroll ───
 const stickyHeader = document.getElementById('stickyHeader');
+let lastScrollCompact = false;
 window.addEventListener('scroll', () => {
-  if (window.scrollY > 60) {
-    stickyHeader.classList.add('compact');
-  } else {
-    stickyHeader.classList.remove('compact');
+  const shouldCompact = window.scrollY > 60;
+  if (shouldCompact !== lastScrollCompact) {
+    lastScrollCompact = shouldCompact;
+    if (shouldCompact) stickyHeader.classList.add('compact');
+    else stickyHeader.classList.remove('compact');
   }
 }, { passive: true });
 </script>
