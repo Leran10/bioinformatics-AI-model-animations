@@ -70,8 +70,13 @@
 
   .card-desc { font-size:.88rem; color:#6b7fa0; line-height:1.55; margin-bottom:14px; }
 
-  .card-meta { display:flex; gap:16px; flex-wrap:wrap; }
+  .card-meta { display:flex; gap:8px; flex-wrap:wrap; }
   .meta-tag { font-size:.75rem; color:#4a5a78; background:#0a0e1a; padding:4px 10px; border-radius:6px; border:1px solid #141c2e; }
+  .arch-tag { font-size:.7rem; font-weight:600; padding:4px 10px; border-radius:6px; letter-spacing:.3px; }
+
+  /* ── Filter section labels ── */
+  .filter-section { position:relative; z-index:1; text-align:center; padding:4px 0 0; }
+  .filter-label { font-size:.7rem; color:#3a4a68; text-transform:uppercase; letter-spacing:1.5px; margin-bottom:4px; }
 
   .card-paper { display:inline-flex; align-items:center; gap:5px; font-size:.8rem; color:#4fc3f7; text-decoration:none;
     padding:5px 12px; border-radius:6px; border:1px solid #4fc3f733; background:#4fc3f70a; margin-top:12px; transition:.25s; }
@@ -111,13 +116,25 @@
   <input type="text" id="searchInput" placeholder="Search models (e.g. AlphaFold, protein, DNA, single-cell...)">
 </div>
 
+<div class="filter-section"><div class="filter-label">Filter by Domain</div></div>
 <div class="filters" id="filters">
   <button class="filter-btn active" data-cat="all">All Models</button>
   <button class="filter-btn" data-cat="genomics">Genomics / DNA</button>
   <button class="filter-btn" data-cat="protein">Protein</button>
   <button class="filter-btn" data-cat="singlecell">Single-Cell</button>
-  <button class="filter-btn" data-cat="multimodal">Multi-Omics</button>
+  <button class="filter-btn" data-cat="multiomics">Multi-Omics</button>
   <button class="filter-btn" data-cat="drug">Drug Discovery</button>
+</div>
+
+<div class="filter-section"><div class="filter-label">Filter by Architecture</div></div>
+<div class="filters" id="archFilters">
+  <button class="filter-btn active" data-arch="all">All Architectures</button>
+  <button class="filter-btn" data-arch="transformer" style="--ac:#ab47bc">Transformer</button>
+  <button class="filter-btn" data-arch="ssm" style="--ac:#81c784">SSM / Mamba / Hyena</button>
+  <button class="filter-btn" data-arch="diffusion" style="--ac:#ef5350">Diffusion</button>
+  <button class="filter-btn" data-arch="gnn" style="--ac:#ffa726">GNN (Graph)</button>
+  <button class="filter-btn" data-arch="vae" style="--ac:#ffc107">VAE</button>
+  <button class="filter-btn" data-arch="cnn" style="--ac:#26c6da">CNN</button>
 </div>
 
 <div class="stats">
@@ -135,12 +152,24 @@
 
 <script>
 // ─── Model database ───
+// Architecture color map
+const ARCH_COLORS = {
+  transformer: {bg:'#ab47bc22', border:'#ab47bc', text:'#ce93d8'},
+  ssm:         {bg:'#81c78422', border:'#81c784', text:'#a5d6a7'},
+  diffusion:   {bg:'#ef535022', border:'#ef5350', text:'#ef9a9a'},
+  gnn:         {bg:'#ffa72622', border:'#ffa726', text:'#ffcc80'},
+  vae:         {bg:'#ffc10722', border:'#ffc107', text:'#fff176'},
+  cnn:         {bg:'#26c6da22', border:'#26c6da', text:'#80deea'},
+};
+
 const MODELS = [
   {
     name: 'Evo 2',
     category: 'genomics',
     catLabel: 'Genomics / DNA Language Model',
     color: '#4fc3f7',
+    arch: ['ssm', 'transformer'],
+    archLabel: 'SSM (Hyena) + Transformer',
     desc: 'Genomic foundation model (Arc Institute). StripedHyena-2 architecture with multi-scale convolutions + sparse attention. 40B params, 1M nucleotide context, trained on 8.8T tokens from all domains of life.',
     tags: ['StripedHyena-2', '40B params', '1M context', 'Next-token prediction'],
     status: 'live',
@@ -153,6 +182,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Protein Structure Prediction',
     color: '#66bb6a',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'DeepMind\'s revolutionary protein structure prediction model. Uses MSA processing with Evoformer blocks, structure module with invariant point attention (IPA), and iterative recycling to predict 3D coordinates from sequence.',
     tags: ['Evoformer', 'IPA', 'MSA + Templates', 'SE(3)-equivariant'],
     status: 'coming',
@@ -165,6 +196,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Biomolecular Structure Prediction',
     color: '#66bb6a',
+    arch: ['transformer', 'diffusion'],
+    archLabel: 'Transformer + Diffusion',
     desc: 'Predicts structures of proteins, nucleic acids, ligands, and their complexes. Replaces Evoformer with Pairformer, adds diffusion-based structure generation module for joint modeling of all biomolecules.',
     tags: ['Pairformer', 'Diffusion', 'Multi-molecule', 'Cross-attention'],
     status: 'coming',
@@ -177,6 +210,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Protein Language Model',
     color: '#ab47bc',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Meta AI\'s protein language model (15B params). Learns protein structure and function from sequences via masked language modeling. ESMFold predicts 3D structure directly from a single sequence without MSA.',
     tags: ['Transformer', '15B params', 'MLM', 'Single-sequence folding'],
     status: 'coming',
@@ -189,6 +224,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Multimodal Protein Generative Model',
     color: '#ab47bc',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'EvolutionaryScale\'s multimodal protein model. Jointly reasons over sequence, structure, and function tracks using geometric attention and masked generative pre-training. Designed a novel fluorescent protein (esmGFP).',
     tags: ['Multimodal', 'Geometric Attention', 'Generative', '98B params'],
     status: 'coming',
@@ -201,6 +238,8 @@ const MODELS = [
     category: 'genomics',
     catLabel: 'Genomics / DNA Language Model',
     color: '#4fc3f7',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Multi-species genome foundation model using Byte Pair Encoding tokenization and efficient attention. Replaces k-mer tokenization with BPE for better generalization across species and genomic tasks.',
     tags: ['Transformer', 'BPE tokenizer', 'Multi-species', 'Fine-tunable'],
     status: 'coming',
@@ -213,6 +252,8 @@ const MODELS = [
     category: 'genomics',
     catLabel: 'Genomics / DNA Language Model',
     color: '#4fc3f7',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'InstaDeep\'s DNA foundation model (2.5B params) trained on 3,200+ genomes. Uses 6-mer tokenization and standard transformer architecture for diverse genomic prediction tasks.',
     tags: ['Transformer', '2.5B params', '6-mer tokens', 'Multi-task'],
     status: 'coming',
@@ -225,6 +266,8 @@ const MODELS = [
     category: 'genomics',
     catLabel: 'Gene Expression from DNA',
     color: '#26c6da',
+    arch: ['cnn', 'transformer'],
+    archLabel: 'CNN + Transformer',
     desc: 'DeepMind model predicting gene expression from DNA sequence. Uses convolutional trunk + transformer layers to capture regulatory elements across 200kb context. Predicts histone marks, DNase, and CAGE tracks.',
     tags: ['Conv + Transformer', '200kb context', 'Epigenomics', 'Regulatory prediction'],
     status: 'coming',
@@ -237,6 +280,8 @@ const MODELS = [
     category: 'singlecell',
     catLabel: 'Single-Cell Foundation Model',
     color: '#ffa726',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Generative pre-trained transformer for single-cell multi-omics. Tokenizes gene expression values and uses masked/generative pre-training on 33M cells for cell type annotation, perturbation prediction, and integration.',
     tags: ['Transformer', '33M cells', 'Gene tokens', 'Multi-task'],
     status: 'coming',
@@ -249,6 +294,8 @@ const MODELS = [
     category: 'singlecell',
     catLabel: 'Single-Cell Foundation Model',
     color: '#ffa726',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Large-scale single-cell model (100M params) trained on 50M+ cells. Uses asymmetric encoder-decoder with gene expression tokenization for zero-shot cell type classification and gene network inference.',
     tags: ['Asymmetric Enc-Dec', '50M cells', 'Zero-shot', 'Gene networks'],
     status: 'coming',
@@ -261,6 +308,8 @@ const MODELS = [
     category: 'singlecell',
     catLabel: 'Single-Cell Foundation Model',
     color: '#ffa726',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Transfer learning with transformers for single-cell biology (Theodoris et al.). Rank-orders genes by expression, then uses a BERT-like transformer to learn context-dependent gene network dynamics from 30M cells.',
     tags: ['Rank-value encoding', '30M cells', 'Transfer learning', 'Gene networks'],
     status: 'coming',
@@ -273,6 +322,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Protein Design / Generative',
     color: '#ef5350',
+    arch: ['diffusion', 'transformer'],
+    archLabel: 'Diffusion + Transformer',
     desc: 'Diffusion-based protein structure generation (Baker Lab). Fine-tunes RoseTTAFold on a denoising diffusion framework to generate novel protein backbones conditioned on functional motifs, binding targets, or symmetry.',
     tags: ['Diffusion', 'RoseTTAFold', 'De novo design', 'Motif scaffolding'],
     status: 'coming',
@@ -285,6 +336,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Inverse Folding / Sequence Design',
     color: '#ce93d8',
+    arch: ['gnn'],
+    archLabel: 'GNN',
     desc: 'Message-passing neural network for protein sequence design (Baker Lab). Given a backbone structure, designs amino acid sequences that fold into it. Uses graph neural network on protein structure with edge messages.',
     tags: ['GNN', 'Inverse folding', 'Message passing', 'Autoregressive decoder'],
     status: 'coming',
@@ -297,6 +350,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Variant Effect Prediction',
     color: '#66bb6a',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'DeepMind model for classifying missense variants as pathogenic or benign. Built on AlphaFold\'s architecture, fine-tuned with population frequency data and ClinVar labels to score all possible single amino acid substitutions.',
     tags: ['AlphaFold-derived', 'Pathogenicity', 'Missense variants', '71M predictions'],
     status: 'coming',
@@ -309,6 +364,8 @@ const MODELS = [
     category: 'drug',
     catLabel: 'Drug Discovery / Molecular',
     color: '#ff7043',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Transformer-based models for molecular representation learning. Tokenize SMILES strings and use masked language modeling to learn chemical semantics for property prediction, virtual screening, and drug-likeness.',
     tags: ['SMILES tokenizer', 'MLM', 'Property prediction', 'Virtual screening'],
     status: 'coming',
@@ -321,6 +378,8 @@ const MODELS = [
     category: 'drug',
     catLabel: 'Molecular Docking',
     color: '#ff7043',
+    arch: ['diffusion', 'gnn'],
+    archLabel: 'Diffusion + GNN',
     desc: 'Diffusion-based molecular docking model. Treats ligand pose prediction as a generative diffusion process over the product space of translations, rotations, and torsion angles. Outperforms traditional docking on blind benchmarks.',
     tags: ['Diffusion', 'SE(3)', 'Blind docking', 'Confidence model'],
     status: 'coming',
@@ -333,6 +392,8 @@ const MODELS = [
     category: 'singlecell',
     catLabel: 'Single-Cell Variational Inference',
     color: '#ffc107',
+    arch: ['vae'],
+    archLabel: 'VAE',
     desc: 'Deep generative model for single-cell RNA-seq analysis. Uses a variational autoencoder with negative binomial likelihood to model count data, batch effects, and dropout — enabling integration, differential expression, and imputation.',
     tags: ['VAE', 'Negative binomial', 'Batch correction', 'Latent space'],
     status: 'coming',
@@ -345,6 +406,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Biomolecular Structure Prediction',
     color: '#80cbc4',
+    arch: ['transformer', 'diffusion'],
+    archLabel: 'Transformer + Diffusion',
     desc: 'Open-source biomolecular structure prediction model reproducing AlphaFold3-level accuracy. Uses MSA module, Pairformer trunk, and confidence-guided diffusion for proteins, nucleic acids, and small molecules.',
     tags: ['Open-source', 'Diffusion', 'Pairformer', 'Multi-molecule'],
     status: 'coming',
@@ -357,6 +420,8 @@ const MODELS = [
     category: 'drug',
     catLabel: 'Molecular Property Prediction',
     color: '#ff7043',
+    arch: ['gnn', 'transformer'],
+    archLabel: 'GNN + Transformer',
     desc: 'Self-supervised graph transformer for molecular property prediction. Pre-trains on 10M molecules using graph-level and node-level tasks on molecular graphs, combining GNN message passing with transformer attention.',
     tags: ['Graph Transformer', 'Self-supervised', 'Molecular graphs', '10M molecules'],
     status: 'coming',
@@ -369,6 +434,8 @@ const MODELS = [
     category: 'genomics',
     catLabel: 'Bidirectional DNA Language Model',
     color: '#4dd0e1',
+    arch: ['ssm'],
+    archLabel: 'SSM (Mamba)',
     desc: 'Bidirectional DNA language model using Mamba state-space architecture with reverse complement equivariance. Handles both strands natively, enabling better variant effect prediction and regulatory element detection.',
     tags: ['Mamba SSM', 'Bidirectional', 'RC-equivariant', 'Long context'],
     status: 'coming',
@@ -381,6 +448,8 @@ const MODELS = [
     category: 'protein',
     catLabel: 'Structure-Aware Protein LM',
     color: '#ba68c8',
+    arch: ['transformer'],
+    archLabel: 'Transformer',
     desc: 'Structure-aware protein language model that combines amino acid sequence with Foldseek structural tokens as input. Dual-token vocabulary captures both evolutionary and 3D structural information for improved protein understanding.',
     tags: ['Foldseek tokens', 'Structure+Sequence', 'ESM-based', 'Dual vocabulary'],
     status: 'coming',
@@ -394,16 +463,19 @@ const MODELS = [
 const grid = document.getElementById('grid');
 const searchInput = document.getElementById('searchInput');
 let activeCategory = 'all';
+let activeArch = 'all';
 
-function renderCards(filter, search) {
+function renderCards(filter, archFilter, search) {
   grid.innerHTML = '';
   let liveN = 0, comingN = 0;
   const cards = MODELS.filter(m => {
     if (filter !== 'all' && m.category !== filter) return false;
+    if (archFilter !== 'all' && !m.arch.includes(archFilter)) return false;
     if (search) {
       const q = search.toLowerCase();
       return m.name.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q) ||
-             m.catLabel.toLowerCase().includes(q) || m.tags.some(t => t.toLowerCase().includes(q));
+             m.catLabel.toLowerCase().includes(q) || m.archLabel.toLowerCase().includes(q) ||
+             m.tags.some(t => t.toLowerCase().includes(q));
     }
     return true;
   });
@@ -413,6 +485,13 @@ function renderCards(filter, search) {
     const card = document.createElement('div');
     card.className = 'card' + (m.status === 'coming' ? ' coming-soon' : '');
     card.style.animationDelay = (i * 0.05) + 's';
+
+    // Build architecture badge(s)
+    const archBadges = m.arch.map(a => {
+      const c = ARCH_COLORS[a] || {bg:'#fff1',border:'#fff3',text:'#aaa'};
+      return `<span class="arch-tag" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${a === 'ssm' ? 'SSM' : a === 'gnn' ? 'GNN' : a === 'vae' ? 'VAE' : a === 'cnn' ? 'CNN' : a.charAt(0).toUpperCase()+a.slice(1)}</span>`;
+    }).join('');
+
     card.innerHTML = `
       <div class="card-glow" style="background:linear-gradient(90deg,transparent,${m.color},transparent)"></div>
       <div class="card-body">
@@ -420,6 +499,9 @@ function renderCards(filter, search) {
         <div class="card-title">
           ${m.name}
           <span class="badge ${m.status === 'live' ? 'badge-live' : 'badge-soon'}">${m.status === 'live' ? 'Interactive' : 'Coming Soon'}</span>
+        </div>
+        <div class="card-meta" style="margin-bottom:8px">
+          ${archBadges}
         </div>
         <div class="card-desc">${m.desc}</div>
         <div class="card-meta">
@@ -441,22 +523,31 @@ function renderCards(filter, search) {
   document.getElementById('comingCount').textContent = comingN;
 }
 
-// ─── Filters ───
+// ─── Domain Filters ───
 document.getElementById('filters').addEventListener('click', e => {
   if (!e.target.classList.contains('filter-btn')) return;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#filters .filter-btn').forEach(b => b.classList.remove('active'));
   e.target.classList.add('active');
   activeCategory = e.target.dataset.cat;
-  renderCards(activeCategory, searchInput.value);
+  renderCards(activeCategory, activeArch, searchInput.value);
+});
+
+// ─── Architecture Filters ───
+document.getElementById('archFilters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('#archFilters .filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeArch = e.target.dataset.arch;
+  renderCards(activeCategory, activeArch, searchInput.value);
 });
 
 // ─── Search ───
 searchInput.addEventListener('input', () => {
-  renderCards(activeCategory, searchInput.value);
+  renderCards(activeCategory, activeArch, searchInput.value);
 });
 
 // ─── Initial render ───
-renderCards('all', '');
+renderCards('all', 'all', '');
 
 // ─── Animated background (floating DNA-like particles) ───
 const bgCanvas = document.getElementById('bgCanvas');
