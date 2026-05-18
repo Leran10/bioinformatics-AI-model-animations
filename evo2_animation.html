@@ -8,14 +8,24 @@
   * { margin:0; padding:0; box-sizing:border-box; }
   body { background:#0a0e1a; color:#e0e6f0; font-family:'Segoe UI',system-ui,sans-serif; overflow-x:hidden; }
 
+  /* ── Sticky header wrapper ── */
+  .sticky-header { position:sticky; top:0; z-index:100; background:#0a0e1a; border-bottom:1px solid #1a2240; transition:all .3s; }
+  .sticky-header.compact header { padding:6px 20px 2px; }
+  .sticky-header.compact header h1 { font-size:1.1rem; }
+  .sticky-header.compact header p { max-height:0; overflow:hidden; opacity:0; margin:0; padding:0; }
+  .sticky-header.compact #controls { padding:3px 16px; gap:6px; }
+  .sticky-header.compact #controls button { padding:4px 10px; font-size:.75rem; }
+  .sticky-header.compact #legend { padding:2px 12px; font-size:.7rem; gap:12px; }
+  .sticky-header.compact #legend .leg span { width:10px; height:10px; }
+
   /* ── Top bar ── */
-  header { text-align:center; padding:14px 20px 4px; }
-  header h1 { font-size:1.6rem; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
+  header { text-align:center; padding:14px 20px 4px; transition:all .3s; }
+  header h1 { font-size:1.6rem; transition:font-size .3s; background:linear-gradient(90deg,#4fc3f7,#ab47bc,#4fc3f7); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-size:200% 100%; animation:shimmer 4s linear infinite; }
   @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
-  header p { color:#8892a8; margin-top:4px; font-size:0.85rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.4; }
+  header p { color:#8892a8; margin-top:4px; font-size:0.85rem; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.4; transition:all .3s; }
 
   /* ── Controls ── */
-  #controls { display:flex; justify-content:center; gap:10px; padding:6px 16px; flex-wrap:wrap; }
+  #controls { display:flex; justify-content:center; gap:10px; padding:6px 16px; flex-wrap:wrap; transition:all .3s; }
   button { background:#1a2038; border:1px solid #2e3a56; color:#b0bcd4; padding:6px 16px; border-radius:8px; cursor:pointer; font-size:.82rem; transition:.2s; font-family:inherit; }
   button:hover { background:#24304e; border-color:#4fc3f7; color:#fff; }
   button.active { background:#1b2d4d; border-color:#4fc3f7; color:#4fc3f7; }
@@ -47,40 +57,43 @@
   .takeaway::before { content:'Key idea: '; font-weight:700; color:#81c784; }
 
   /* ── Legend ── */
-  #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; }
+  #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; transition:all .3s; }
   .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
-  .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; }
+  .leg span { display:inline-block; width:14px; height:14px; border-radius:3px; transition:all .3s; }
 
   /* ── Back link ── */
-  .back-link { position:absolute; top:16px; left:20px; color:#4fc3f7; text-decoration:none; font-size:.9rem; z-index:10; }
+  .back-link { position:absolute; top:10px; left:20px; color:#4fc3f7; text-decoration:none; font-size:.85rem; z-index:10; }
   .back-link:hover { text-decoration:underline; }
+  .sticky-header.compact .back-link { top:6px; font-size:.78rem; }
 </style>
 </head>
 <body>
 
-<a class="back-link" href="index.html">&larr; All Models</a>
+<div class="sticky-header" id="stickyHeader">
+  <a class="back-link" href="evo2_intro.html">&larr; Back to Primer</a>
 
-<header>
-  <h1>Evo 2 — Genomic Foundation Model</h1>
-  <p>A deep learning model that reads DNA like a language model reads text. It learns the "grammar" of genomes from billions of DNA sequences across all life on Earth, then predicts what comes next in a DNA sequence.</p>
-</header>
+  <header>
+    <h1>Evo 2 — Genomic Foundation Model</h1>
+    <p>A deep learning model that reads DNA like a language model reads text. It learns the "grammar" of genomes from billions of DNA sequences across all life on Earth, then predicts what comes next in a DNA sequence.</p>
+  </header>
 
-<div id="controls">
-  <button id="btn-play" class="active">&#9654; Play</button>
-  <button id="btn-pause">&#10074;&#10074; Pause</button>
-  <button id="btn-reset">&#8635; Reset</button>
-  <button id="btn-prev">&larr; Prev</button>
-  <button id="btn-next">Next &rarr;</button>
-  <span id="speed-label">Speed</span>
-  <input type="range" id="speed" min="1" max="5" value="3" style="width:100px;">
-</div>
+  <div id="controls">
+    <button id="btn-play" class="active">&#9654; Play</button>
+    <button id="btn-pause">&#10074;&#10074; Pause</button>
+    <button id="btn-reset">&#8635; Reset</button>
+    <button id="btn-prev">&larr; Prev</button>
+    <button id="btn-next">Next &rarr;</button>
+    <span id="speed-label">Speed</span>
+    <input type="range" id="speed" min="1" max="5" value="3" style="width:100px;">
+  </div>
 
-<div id="legend">
-  <div class="leg"><span style="background:#4fc3f7"></span> Data flowing through the model</div>
-  <div class="leg"><span style="background:#81c784"></span> Pattern detectors (short / medium / long range)</div>
-  <div class="leg"><span style="background:#ce93d8"></span> Attention (comparing all positions)</div>
-  <div class="leg"><span style="background:#ffb74d"></span> Thinking layers (processing information)</div>
-  <div class="leg"><span style="background:#ef5350"></span> Shortcut connections (preventing information loss)</div>
+  <div id="legend">
+    <div class="leg"><span style="background:#4fc3f7"></span> Data flowing through the model</div>
+    <div class="leg"><span style="background:#81c784"></span> Pattern detectors (short / medium / long range)</div>
+    <div class="leg"><span style="background:#ce93d8"></span> Attention (comparing all positions)</div>
+    <div class="leg"><span style="background:#ffb74d"></span> Thinking layers (processing information)</div>
+    <div class="leg"><span style="background:#ef5350"></span> Shortcut connections (preventing information loss)</div>
+  </div>
 </div>
 
 <div id="stage">
@@ -796,6 +809,16 @@ function loop(ts) {
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
+
+// ─── Sticky header: compact on scroll ───
+const stickyHeader = document.getElementById('stickyHeader');
+window.addEventListener('scroll', () => {
+  if (window.scrollY > 60) {
+    stickyHeader.classList.add('compact');
+  } else {
+    stickyHeader.classList.remove('compact');
+  }
+}, { passive: true });
 </script>
 </body>
 </html>
