@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BioAI Animations — Learn Bioinformatics AI Models Visually</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#06080f; color:#d0d8e8; font-family:'Inter',system-ui,sans-serif; min-height:100vh; }
+
+  /* ── Animated background ── */
+  .bg-canvas { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none; }
+
+  /* ── Header ── */
+  header { position:relative; z-index:1; text-align:center; padding:50px 20px 30px; }
+  .logo { font-size:3rem; font-weight:800; letter-spacing:-1px;
+    background:linear-gradient(135deg,#4fc3f7,#ab47bc,#66bb6a,#4fc3f7);
+    background-size:300% 300%; -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    animation:logoShimmer 6s ease infinite; }
+  @keyframes logoShimmer { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .logo-dna { font-size:2.4rem; margin-right:8px; -webkit-text-fill-color:initial; }
+  header p { color:#6b7fa0; font-size:1.05rem; margin-top:10px; max-width:700px; margin-left:auto; margin-right:auto; line-height:1.6; }
+  .subtitle-highlight { color:#4fc3f7; font-weight:500; }
+
+  /* ── Search ── */
+  .search-bar { position:relative; z-index:1; max-width:520px; margin:24px auto 10px; padding:0 20px; }
+  .search-bar input { width:100%; padding:14px 20px 14px 48px; background:#0d1220; border:1px solid #1e2a44;
+    border-radius:12px; color:#d0d8e8; font-size:1rem; outline:none; transition:.3s; font-family:inherit; }
+  .search-bar input:focus { border-color:#4fc3f7; box-shadow:0 0 20px #4fc3f722; }
+  .search-bar input::placeholder { color:#3a4a68; }
+  .search-icon { position:absolute; left:36px; top:50%; transform:translateY(-50%); color:#3a4a68; font-size:1.1rem; pointer-events:none; }
+
+  /* ── Category filters ── */
+  .filters { position:relative; z-index:1; display:flex; justify-content:center; gap:10px; padding:16px 20px; flex-wrap:wrap; }
+  .filter-btn { padding:8px 18px; border-radius:20px; border:1px solid #1e2a44; background:#0d1220;
+    color:#6b7fa0; font-size:.85rem; cursor:pointer; transition:.3s; font-family:inherit; }
+  .filter-btn:hover { border-color:#4fc3f7; color:#a0bce0; }
+  .filter-btn.active { background:#152040; border-color:#4fc3f7; color:#4fc3f7; }
+
+  /* ── Stats bar ── */
+  .stats { position:relative; z-index:1; display:flex; justify-content:center; gap:40px; padding:10px 20px 20px; }
+  .stat { text-align:center; }
+  .stat-num { font-size:1.6rem; font-weight:700; color:#4fc3f7; }
+  .stat-label { font-size:.75rem; color:#4a5a78; margin-top:2px; text-transform:uppercase; letter-spacing:1px; }
+
+  /* ── Card grid ── */
+  .grid { position:relative; z-index:1; display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+    gap:20px; max-width:1200px; margin:0 auto; padding:10px 24px 60px; }
+
+  /* ── Model card ── */
+  .card { background:#0c1220; border:1px solid #1a2440; border-radius:16px; overflow:hidden;
+    transition:all .35s cubic-bezier(.4,0,.2,1); cursor:pointer; position:relative; }
+  .card:hover { border-color:#4fc3f788; transform:translateY(-4px); box-shadow:0 12px 40px #0008,0 0 30px #4fc3f711; }
+  .card.coming-soon { opacity:0.55; }
+  .card.coming-soon:hover { transform:none; box-shadow:none; border-color:#1a2440; cursor:default; }
+
+  .card-glow { position:absolute; top:-1px; left:-1px; right:-1px; height:3px; border-radius:16px 16px 0 0;
+    opacity:0; transition:opacity .35s; }
+  .card:hover .card-glow { opacity:1; }
+
+  .card-body { padding:22px 24px 20px; }
+
+  .card-category { font-size:.7rem; text-transform:uppercase; letter-spacing:1.5px; font-weight:600; margin-bottom:8px; }
+  .card-title { font-size:1.25rem; font-weight:700; color:#e4ecf8; margin-bottom:6px; display:flex; align-items:center; gap:10px; }
+  .card-title .badge { font-size:.65rem; padding:3px 8px; border-radius:6px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; }
+  .badge-live { background:#4fc3f722; color:#4fc3f7; }
+  .badge-soon { background:#ffffff0e; color:#4a5a78; }
+
+  .card-desc { font-size:.88rem; color:#6b7fa0; line-height:1.55; margin-bottom:14px; }
+
+  .card-meta { display:flex; gap:16px; flex-wrap:wrap; }
+  .meta-tag { font-size:.75rem; color:#4a5a78; background:#0a0e1a; padding:4px 10px; border-radius:6px; border:1px solid #141c2e; }
+
+  .card-arrow { position:absolute; bottom:20px; right:22px; font-size:1.4rem; color:#4fc3f7; opacity:0; transition:.3s; }
+  .card:hover .card-arrow { opacity:1; transform:translateX(4px); }
+  .card.coming-soon:hover .card-arrow { opacity:0; }
+
+  /* ── Footer ── */
+  footer { position:relative; z-index:1; text-align:center; padding:40px 20px; border-top:1px solid #111828; }
+  footer p { color:#3a4a68; font-size:.85rem; }
+  footer a { color:#4fc3f7; text-decoration:none; }
+  footer a:hover { text-decoration:underline; }
+
+  /* ── Responsive ── */
+  @media(max-width:700px){
+    .logo { font-size:2rem; }
+    header p { font-size:.9rem; }
+    .grid { grid-template-columns:1fr; padding:10px 14px 40px; }
+    .stats { gap:24px; }
+  }
+</style>
+</head>
+<body>
+
+<canvas class="bg-canvas" id="bgCanvas"></canvas>
+
+<header>
+  <div class="logo">BioAI Animations</div>
+  <p>Understand every major <span class="subtitle-highlight">AI model in bioinformatics</span> through interactive, step-by-step animations. From DNA language models to protein structure predictors — see how data flows through each layer.</p>
+</header>
+
+<div class="search-bar">
+  <span class="search-icon">&#128269;</span>
+  <input type="text" id="searchInput" placeholder="Search models (e.g. AlphaFold, protein, DNA, single-cell...)">
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" data-cat="all">All Models</button>
+  <button class="filter-btn" data-cat="genomics">Genomics / DNA</button>
+  <button class="filter-btn" data-cat="protein">Protein</button>
+  <button class="filter-btn" data-cat="singlecell">Single-Cell</button>
+  <button class="filter-btn" data-cat="multimodal">Multi-Omics</button>
+  <button class="filter-btn" data-cat="drug">Drug Discovery</button>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num" id="totalModels">0</div><div class="stat-label">Models</div></div>
+  <div class="stat"><div class="stat-num" id="liveCount">0</div><div class="stat-label">Live</div></div>
+  <div class="stat"><div class="stat-num" id="comingCount">0</div><div class="stat-label">Coming Soon</div></div>
+</div>
+
+<div class="grid" id="grid"></div>
+
+<footer>
+  <p>Built to make bioinformatics AI accessible to everyone.<br>
+  <a href="https://github.com/Leran10/bioinformatics-AI-model-animations" target="_blank">GitHub</a> &mdash; Contributions welcome!</p>
+</footer>
+
+<script>
+// ─── Model database ───
+const MODELS = [
+  {
+    name: 'Evo 2',
+    category: 'genomics',
+    catLabel: 'Genomics / DNA Language Model',
+    color: '#4fc3f7',
+    desc: 'Genomic foundation model (Arc Institute). StripedHyena-2 architecture with multi-scale convolutions + sparse attention. 40B params, 1M nucleotide context, trained on 8.8T tokens from all domains of life.',
+    tags: ['StripedHyena-2', '40B params', '1M context', 'Next-token prediction'],
+    status: 'live',
+    url: 'evo2_animation.html',
+    year: 2025,
+  },
+  {
+    name: 'AlphaFold 2',
+    category: 'protein',
+    catLabel: 'Protein Structure Prediction',
+    color: '#66bb6a',
+    desc: 'DeepMind\'s revolutionary protein structure prediction model. Uses MSA processing with Evoformer blocks, structure module with invariant point attention (IPA), and iterative recycling to predict 3D coordinates from sequence.',
+    tags: ['Evoformer', 'IPA', 'MSA + Templates', 'SE(3)-equivariant'],
+    status: 'coming',
+    url: '#',
+    year: 2021,
+  },
+  {
+    name: 'AlphaFold 3',
+    category: 'protein',
+    catLabel: 'Biomolecular Structure Prediction',
+    color: '#66bb6a',
+    desc: 'Predicts structures of proteins, nucleic acids, ligands, and their complexes. Replaces Evoformer with Pairformer, adds diffusion-based structure generation module for joint modeling of all biomolecules.',
+    tags: ['Pairformer', 'Diffusion', 'Multi-molecule', 'Cross-attention'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'ESM-2 / ESMFold',
+    category: 'protein',
+    catLabel: 'Protein Language Model',
+    color: '#ab47bc',
+    desc: 'Meta AI\'s protein language model (15B params). Learns protein structure and function from sequences via masked language modeling. ESMFold predicts 3D structure directly from a single sequence without MSA.',
+    tags: ['Transformer', '15B params', 'MLM', 'Single-sequence folding'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'ESM3',
+    category: 'protein',
+    catLabel: 'Multimodal Protein Generative Model',
+    color: '#ab47bc',
+    desc: 'EvolutionaryScale\'s multimodal protein model. Jointly reasons over sequence, structure, and function tracks using geometric attention and masked generative pre-training. Designed a novel fluorescent protein (esmGFP).',
+    tags: ['Multimodal', 'Geometric Attention', 'Generative', '98B params'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'DNABERT-2',
+    category: 'genomics',
+    catLabel: 'Genomics / DNA Language Model',
+    color: '#4fc3f7',
+    desc: 'Multi-species genome foundation model using Byte Pair Encoding tokenization and efficient attention. Replaces k-mer tokenization with BPE for better generalization across species and genomic tasks.',
+    tags: ['Transformer', 'BPE tokenizer', 'Multi-species', 'Fine-tunable'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'Nucleotide Transformer',
+    category: 'genomics',
+    catLabel: 'Genomics / DNA Language Model',
+    color: '#4fc3f7',
+    desc: 'InstaDeep\'s DNA foundation model (2.5B params) trained on 3,200+ genomes. Uses 6-mer tokenization and standard transformer architecture for diverse genomic prediction tasks.',
+    tags: ['Transformer', '2.5B params', '6-mer tokens', 'Multi-task'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'Enformer',
+    category: 'genomics',
+    catLabel: 'Gene Expression from DNA',
+    color: '#26c6da',
+    desc: 'DeepMind model predicting gene expression from DNA sequence. Uses convolutional trunk + transformer layers to capture regulatory elements across 200kb context. Predicts histone marks, DNase, and CAGE tracks.',
+    tags: ['Conv + Transformer', '200kb context', 'Epigenomics', 'Regulatory prediction'],
+    status: 'coming',
+    url: '#',
+    year: 2021,
+  },
+  {
+    name: 'scGPT',
+    category: 'singlecell',
+    catLabel: 'Single-Cell Foundation Model',
+    color: '#ffa726',
+    desc: 'Generative pre-trained transformer for single-cell multi-omics. Tokenizes gene expression values and uses masked/generative pre-training on 33M cells for cell type annotation, perturbation prediction, and integration.',
+    tags: ['Transformer', '33M cells', 'Gene tokens', 'Multi-task'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'scFoundation',
+    category: 'singlecell',
+    catLabel: 'Single-Cell Foundation Model',
+    color: '#ffa726',
+    desc: 'Large-scale single-cell model (100M params) trained on 50M+ cells. Uses asymmetric encoder-decoder with gene expression tokenization for zero-shot cell type classification and gene network inference.',
+    tags: ['Asymmetric Enc-Dec', '50M cells', 'Zero-shot', 'Gene networks'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'Geneformer',
+    category: 'singlecell',
+    catLabel: 'Single-Cell Foundation Model',
+    color: '#ffa726',
+    desc: 'Transfer learning with transformers for single-cell biology (Theodoris et al.). Rank-orders genes by expression, then uses a BERT-like transformer to learn context-dependent gene network dynamics from 30M cells.',
+    tags: ['Rank-value encoding', '30M cells', 'Transfer learning', 'Gene networks'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'RFdiffusion',
+    category: 'protein',
+    catLabel: 'Protein Design / Generative',
+    color: '#ef5350',
+    desc: 'Diffusion-based protein structure generation (Baker Lab). Fine-tunes RoseTTAFold on a denoising diffusion framework to generate novel protein backbones conditioned on functional motifs, binding targets, or symmetry.',
+    tags: ['Diffusion', 'RoseTTAFold', 'De novo design', 'Motif scaffolding'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'ProteinMPNN',
+    category: 'protein',
+    catLabel: 'Inverse Folding / Sequence Design',
+    color: '#ce93d8',
+    desc: 'Message-passing neural network for protein sequence design (Baker Lab). Given a backbone structure, designs amino acid sequences that fold into it. Uses graph neural network on protein structure with edge messages.',
+    tags: ['GNN', 'Inverse folding', 'Message passing', 'Autoregressive decoder'],
+    status: 'coming',
+    url: '#',
+    year: 2022,
+  },
+  {
+    name: 'AlphaMissense',
+    category: 'protein',
+    catLabel: 'Variant Effect Prediction',
+    color: '#66bb6a',
+    desc: 'DeepMind model for classifying missense variants as pathogenic or benign. Built on AlphaFold\'s architecture, fine-tuned with population frequency data and ClinVar labels to score all possible single amino acid substitutions.',
+    tags: ['AlphaFold-derived', 'Pathogenicity', 'Missense variants', '71M predictions'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'MolBERT / ChemBERTa',
+    category: 'drug',
+    catLabel: 'Drug Discovery / Molecular',
+    color: '#ff7043',
+    desc: 'Transformer-based models for molecular representation learning. Tokenize SMILES strings and use masked language modeling to learn chemical semantics for property prediction, virtual screening, and drug-likeness.',
+    tags: ['SMILES tokenizer', 'MLM', 'Property prediction', 'Virtual screening'],
+    status: 'coming',
+    url: '#',
+    year: 2022,
+  },
+  {
+    name: 'DiffDock',
+    category: 'drug',
+    catLabel: 'Molecular Docking',
+    color: '#ff7043',
+    desc: 'Diffusion-based molecular docking model. Treats ligand pose prediction as a generative diffusion process over the product space of translations, rotations, and torsion angles. Outperforms traditional docking on blind benchmarks.',
+    tags: ['Diffusion', 'SE(3)', 'Blind docking', 'Confidence model'],
+    status: 'coming',
+    url: '#',
+    year: 2023,
+  },
+  {
+    name: 'scVI',
+    category: 'singlecell',
+    catLabel: 'Single-Cell Variational Inference',
+    color: '#ffc107',
+    desc: 'Deep generative model for single-cell RNA-seq analysis. Uses a variational autoencoder with negative binomial likelihood to model count data, batch effects, and dropout — enabling integration, differential expression, and imputation.',
+    tags: ['VAE', 'Negative binomial', 'Batch correction', 'Latent space'],
+    status: 'coming',
+    url: '#',
+    year: 2018,
+  },
+  {
+    name: 'Boltz-1',
+    category: 'protein',
+    catLabel: 'Biomolecular Structure Prediction',
+    color: '#80cbc4',
+    desc: 'Open-source biomolecular structure prediction model reproducing AlphaFold3-level accuracy. Uses MSA module, Pairformer trunk, and confidence-guided diffusion for proteins, nucleic acids, and small molecules.',
+    tags: ['Open-source', 'Diffusion', 'Pairformer', 'Multi-molecule'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'GROVER',
+    category: 'drug',
+    catLabel: 'Molecular Property Prediction',
+    color: '#ff7043',
+    desc: 'Self-supervised graph transformer for molecular property prediction. Pre-trains on 10M molecules using graph-level and node-level tasks on molecular graphs, combining GNN message passing with transformer attention.',
+    tags: ['Graph Transformer', 'Self-supervised', 'Molecular graphs', '10M molecules'],
+    status: 'coming',
+    url: '#',
+    year: 2020,
+  },
+  {
+    name: 'Caduceus',
+    category: 'genomics',
+    catLabel: 'Bidirectional DNA Language Model',
+    color: '#4dd0e1',
+    desc: 'Bidirectional DNA language model using Mamba state-space architecture with reverse complement equivariance. Handles both strands natively, enabling better variant effect prediction and regulatory element detection.',
+    tags: ['Mamba SSM', 'Bidirectional', 'RC-equivariant', 'Long context'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+  {
+    name: 'SaProt',
+    category: 'protein',
+    catLabel: 'Structure-Aware Protein LM',
+    color: '#ba68c8',
+    desc: 'Structure-aware protein language model that combines amino acid sequence with Foldseek structural tokens as input. Dual-token vocabulary captures both evolutionary and 3D structural information for improved protein understanding.',
+    tags: ['Foldseek tokens', 'Structure+Sequence', 'ESM-based', 'Dual vocabulary'],
+    status: 'coming',
+    url: '#',
+    year: 2024,
+  },
+];
+
+// ─── Render ───
+const grid = document.getElementById('grid');
+const searchInput = document.getElementById('searchInput');
+let activeCategory = 'all';
+
+function renderCards(filter, search) {
+  grid.innerHTML = '';
+  let liveN = 0, comingN = 0;
+  const cards = MODELS.filter(m => {
+    if (filter !== 'all' && m.category !== filter) return false;
+    if (search) {
+      const q = search.toLowerCase();
+      return m.name.toLowerCase().includes(q) || m.desc.toLowerCase().includes(q) ||
+             m.catLabel.toLowerCase().includes(q) || m.tags.some(t => t.toLowerCase().includes(q));
+    }
+    return true;
+  });
+
+  cards.forEach((m, i) => {
+    if (m.status === 'live') liveN++; else comingN++;
+    const card = document.createElement('div');
+    card.className = 'card' + (m.status === 'coming' ? ' coming-soon' : '');
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.innerHTML = `
+      <div class="card-glow" style="background:linear-gradient(90deg,transparent,${m.color},transparent)"></div>
+      <div class="card-body">
+        <div class="card-category" style="color:${m.color}">${m.catLabel}</div>
+        <div class="card-title">
+          ${m.name}
+          <span class="badge ${m.status === 'live' ? 'badge-live' : 'badge-soon'}">${m.status === 'live' ? 'Interactive' : 'Coming Soon'}</span>
+        </div>
+        <div class="card-desc">${m.desc}</div>
+        <div class="card-meta">
+          ${m.tags.map(t => `<span class="meta-tag">${t}</span>`).join('')}
+          <span class="meta-tag">${m.year}</span>
+        </div>
+      </div>
+      <div class="card-arrow">${m.status === 'live' ? '&#8594;' : ''}</div>
+    `;
+    if (m.status === 'live') {
+      card.addEventListener('click', () => window.location.href = m.url);
+    }
+    grid.appendChild(card);
+  });
+
+  document.getElementById('totalModels').textContent = cards.length;
+  document.getElementById('liveCount').textContent = liveN;
+  document.getElementById('comingCount').textContent = comingN;
+}
+
+// ─── Filters ───
+document.getElementById('filters').addEventListener('click', e => {
+  if (!e.target.classList.contains('filter-btn')) return;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  activeCategory = e.target.dataset.cat;
+  renderCards(activeCategory, searchInput.value);
+});
+
+// ─── Search ───
+searchInput.addEventListener('input', () => {
+  renderCards(activeCategory, searchInput.value);
+});
+
+// ─── Initial render ───
+renderCards('all', '');
+
+// ─── Animated background (floating DNA-like particles) ───
+const bgCanvas = document.getElementById('bgCanvas');
+const bgCtx = bgCanvas.getContext('2d');
+let bgW, bgH;
+function resizeBg() {
+  bgW = window.innerWidth; bgH = window.innerHeight;
+  bgCanvas.width = bgW; bgCanvas.height = bgH;
+}
+resizeBg();
+window.addEventListener('resize', resizeBg);
+
+const dots = [];
+for (let i = 0; i < 60; i++) {
+  dots.push({
+    x: Math.random() * 2000,
+    y: Math.random() * 2000,
+    vx: (Math.random() - 0.5) * 0.3,
+    vy: (Math.random() - 0.5) * 0.3,
+    r: 1.5 + Math.random() * 2,
+    color: ['#4fc3f7','#ab47bc','#66bb6a','#ffa726','#ef5350'][Math.floor(Math.random()*5)],
+  });
+}
+
+function drawBg() {
+  bgCtx.clearRect(0, 0, bgW, bgH);
+  for (const d of dots) {
+    d.x += d.vx; d.y += d.vy;
+    if (d.x < 0) d.x = bgW; if (d.x > bgW) d.x = 0;
+    if (d.y < 0) d.y = bgH; if (d.y > bgH) d.y = 0;
+    bgCtx.beginPath();
+    bgCtx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+    bgCtx.fillStyle = d.color + '30';
+    bgCtx.fill();
+  }
+  // draw faint connections
+  bgCtx.lineWidth = 0.5;
+  for (let i = 0; i < dots.length; i++) {
+    for (let j = i + 1; j < dots.length; j++) {
+      const dx = dots[i].x - dots[j].x;
+      const dy = dots[i].y - dots[j].y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 120) {
+        bgCtx.strokeStyle = dots[i].color + Math.floor((1 - dist / 120) * 20).toString(16).padStart(2, '0');
+        bgCtx.beginPath();
+        bgCtx.moveTo(dots[i].x, dots[i].y);
+        bgCtx.lineTo(dots[j].x, dots[j].y);
+        bgCtx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+</script>
+</body>
+</html>
