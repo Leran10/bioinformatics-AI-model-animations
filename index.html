@@ -129,6 +129,7 @@
 <div class="filter-section"><div class="filter-label">Filter by Architecture</div></div>
 <div class="filters" id="archFilters">
   <button class="filter-btn active" data-arch="all">All Architectures</button>
+  <button class="filter-btn" data-arch="mlp" style="--ac:#ffb74d">MLP</button>
   <button class="filter-btn" data-arch="transformer" style="--ac:#ab47bc">Transformer</button>
   <button class="filter-btn" data-arch="ssm" style="--ac:#81c784">SSM / Mamba / Hyena</button>
   <button class="filter-btn" data-arch="diffusion" style="--ac:#ef5350">Diffusion</button>
@@ -154,6 +155,7 @@
 // ─── Model database ───
 // Architecture color map
 const ARCH_COLORS = {
+  mlp:         {bg:'#ffb74d22', border:'#ffb74d', text:'#ffcc80'},
   transformer: {bg:'#ab47bc22', border:'#ab47bc', text:'#ce93d8'},
   ssm:         {bg:'#81c78422', border:'#81c784', text:'#a5d6a7'},
   diffusion:   {bg:'#ef535022', border:'#ef5350', text:'#ef9a9a'},
@@ -168,8 +170,8 @@ const MODELS = [
     category: 'genomics',
     catLabel: 'Genomics / DNA Language Model',
     color: '#4fc3f7',
-    arch: ['ssm', 'transformer'],
-    archLabel: 'SSM (Hyena) + Transformer',
+    arch: ['ssm', 'transformer', 'mlp'],
+    archLabel: 'SSM (Hyena) + Transformer + MLP',
     desc: 'Genomic foundation model (Arc Institute). StripedHyena-2 architecture with multi-scale convolutions + sparse attention. 40B params, 1M nucleotide context, trained on 8.8T tokens from all domains of life.',
     tags: ['StripedHyena-2', '40B params', '1M context', 'Next-token prediction'],
     status: 'live',
@@ -489,7 +491,7 @@ function renderCards(filter, archFilter, search) {
     // Build architecture badge(s)
     const archBadges = m.arch.map(a => {
       const c = ARCH_COLORS[a] || {bg:'#fff1',border:'#fff3',text:'#aaa'};
-      return `<span class="arch-tag" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${a === 'ssm' ? 'SSM' : a === 'gnn' ? 'GNN' : a === 'vae' ? 'VAE' : a === 'cnn' ? 'CNN' : a.charAt(0).toUpperCase()+a.slice(1)}</span>`;
+      return `<span class="arch-tag" style="background:${c.bg};border:1px solid ${c.border};color:${c.text}">${a === 'ssm' ? 'SSM' : a === 'gnn' ? 'GNN' : a === 'vae' ? 'VAE' : a === 'cnn' ? 'CNN' : a === 'mlp' ? 'MLP' : a.charAt(0).toUpperCase()+a.slice(1)}</span>`;
     }).join('');
 
     card.innerHTML = `

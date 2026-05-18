@@ -99,6 +99,7 @@
     <h1>Evo 2</h1>
     <div class="subtitle">Before we dive into how Evo 2 processes DNA step-by-step, let's understand the AI building blocks it uses. No prior machine learning knowledge required.</div>
     <div class="model-badges">
+      <span class="mbadge" style="background:#ffb74d22;border:1px solid #ffb74d;color:#ffcc80">MLP</span>
       <span class="mbadge" style="background:#81c78422;border:1px solid #81c784;color:#a5d6a7">SSM / Hyena</span>
       <span class="mbadge" style="background:#ab47bc22;border:1px solid #ab47bc;color:#ce93d8">Transformer (Attention)</span>
       <span class="mbadge" style="background:#66bb6a22;border:1px solid #66bb6a;color:#a5d6a7">Convolution</span>
@@ -128,16 +129,51 @@
     <div class="analogy"><b>Analogy:</b> Think of a neural network like a factory assembly line. Raw materials (DNA letters) enter at one end. Each workstation (layer) performs a specific operation — checking for patterns, combining information, making decisions. The product that comes out the other end is the prediction. The factory learns to configure each workstation by practicing on millions of examples.</div>
   </div>
 
-  <div class="key-point"><b>Key idea:</b> All the architectures below (Transformers, SSMs, CNNs) are just different designs for these "workstations" — different ways to process and transform data at each layer. The question is always: what's the best way to look at the input data?</div>
+  <div class="key-point"><b>Key idea:</b> All the architectures below (MLPs, Transformers, SSMs, CNNs) are just different designs for these "workstations" — different ways to process and transform data at each layer. The question is always: what's the best way to look at the input data?</div>
 </div>
 
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 1: Convolution                      -->
+<!-- SECTION 1: MLP                              -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
-  <h2><span class="num">1.</span> Convolution — Sliding a Window to Find Patterns</h2>
+  <h2><span class="num">1.</span> MLP — The Simplest Neural Network</h2>
+  <p class="lead">The <b>Multi-Layer Perceptron (MLP)</b> is the most basic building block of deep learning. It's the foundation that every other architecture builds upon — and Evo 2 uses it in several places.</p>
+
+  <div class="concept" style="position:relative;overflow:hidden;">
+    <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#ffb74d,#ffa726)"></div>
+    <h3 style="color:#ffb74d">How It Works</h3>
+    <p>An MLP is a series of <b>fully connected layers</b>. Every input value connects to every output value through learned weights. Each layer does three things:</p>
+    <ol style="color:#8a98b4; padding-left:20px; margin:12px 0; line-height:2;">
+      <li><b>Multiply</b> — each input is multiplied by a learned weight (how important is this input?)</li>
+      <li><b>Sum</b> — all weighted inputs are added together</li>
+      <li><b>Activate</b> — a non-linear function (like GELU or ReLU) decides if this neuron "fires"</li>
+    </ol>
+    <p>Stack multiple layers and you get a network that can learn complex patterns — it just processes each position <b>independently</b> (no awareness of neighbors).</p>
+
+    <div class="diagram">
+      <canvas id="mlpDiagram" height="200"></canvas>
+    </div>
+
+    <div class="analogy"><b>Analogy:</b> Think of an MLP as a panel of judges at a talent show. Each judge (neuron) watches the performance (input), assigns a score based on their personal criteria (weights), and the scores are combined to produce a verdict (output). Multiple rounds of judging (layers) let the panel make increasingly nuanced decisions. But each judge evaluates independently — they don't discuss with each other.</div>
+
+    <div class="key-point"><b>Where Evo 2 uses MLPs:</b><br>
+    - <b>Embedding layer</b> (Step 3): Converts token IDs to rich 4,096-dim vectors via a lookup table (which is a simple MLP operation)<br>
+    - <b>Thinking layers</b> (inside every layer): After each pattern detector or attention block, an MLP processes and combines the detected patterns (4,096 → 11,008 → 4,096 dimensions)<br>
+    - <b>Output layer</b> (Step 9): Converts the final 4,096-dim representation into scores for each possible next letter</div>
+  </div>
+
+  <div class="key-point"><b>Strength:</b> Simple, fast, and effective at combining and transforming features.<br><b>Weakness:</b> Processes each position independently — it cannot see relationships between different positions in the sequence. That's why we need convolutions and attention.</div>
+</div>
+
+<hr class="divider">
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- SECTION 2: Convolution                      -->
+<!-- ═══════════════════════════════════════════ -->
+<div class="section">
+  <h2><span class="num">2.</span> Convolution — Sliding a Window to Find Patterns</h2>
   <p class="lead">Convolution is the oldest and simplest technique Evo 2 uses. It's the backbone of CNNs (Convolutional Neural Networks), used in image recognition since the 1990s.</p>
 
   <div class="concept conv">
@@ -158,10 +194,10 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 2: Attention / Transformer          -->
+<!-- SECTION 3: Attention / Transformer          -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
-  <h2><span class="num">2.</span> Attention — Letting Every Position Talk to Every Other</h2>
+  <h2><span class="num">3.</span> Attention — Letting Every Position Talk to Every Other</h2>
   <p class="lead">The <b>Transformer</b> architecture (2017) revolutionized AI. It powers ChatGPT, AlphaFold, DNABERT, and most modern AI models. Its core innovation: <b>attention</b>.</p>
 
   <div class="concept attn">
@@ -184,10 +220,10 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 3: State-Space Models               -->
+<!-- SECTION 4: State-Space Models               -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
-  <h2><span class="num">3.</span> State-Space Models (SSM) — Remembering As You Read</h2>
+  <h2><span class="num">4.</span> State-Space Models (SSM) — Remembering As You Read</h2>
   <p class="lead">SSMs (including <b>Mamba</b> and <b>Hyena</b>) are the newest architecture family (2023-2024). They're designed to handle very long sequences efficiently — exactly what genomics needs.</p>
 
   <div class="concept ssm">
@@ -210,10 +246,10 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 4: Why Evo 2 is Hybrid             -->
+<!-- SECTION 5: Why Evo 2 is Hybrid             -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
-  <h2><span class="num">4.</span> Why Evo 2 Combines Them — The Hybrid Approach</h2>
+  <h2><span class="num">5.</span> Why Evo 2 Combines Them — The Hybrid Approach</h2>
   <p class="lead">Now you understand the trade-offs. Evo 2's insight: <b>use each technique where it's strongest</b>.</p>
 
   <div class="concept hybrid">
@@ -247,22 +283,23 @@
 <hr class="divider">
 
 <!-- ═══════════════════════════════════════════ -->
-<!-- SECTION 5: Quick comparison                 -->
+<!-- SECTION 6: Quick comparison                 -->
 <!-- ═══════════════════════════════════════════ -->
 <div class="section">
-  <h2><span class="num">5.</span> Architecture Comparison at a Glance</h2>
+  <h2><span class="num">6.</span> Architecture Comparison at a Glance</h2>
 
   <table class="cmp-table">
     <thead>
-      <tr><th>Feature</th><th>Convolution (CNN)</th><th>Attention (Transformer)</th><th>SSM (Hyena/Mamba)</th></tr>
+      <tr><th>Feature</th><th>MLP</th><th>Convolution (CNN)</th><th>Attention (Transformer)</th><th>SSM (Hyena/Mamba)</th></tr>
     </thead>
     <tbody>
-      <tr><td><b>How it looks at data</b></td><td>Small sliding window</td><td>Every position vs. every other</td><td>Compact running memory</td></tr>
-      <tr><td><b>Range</b></td><td>Local only</td><td>Global (all pairs)</td><td>Global (via state)</td></tr>
-      <tr><td><b>Speed for long sequences</b></td><td>O(n) — linear</td><td>O(n&sup2;) — quadratic</td><td>O(n log n) — near-linear</td></tr>
-      <tr><td><b>1M sequence feasible?</b></td><td>Yes (but only local)</td><td>No (too expensive)</td><td>Yes</td></tr>
-      <tr><td><b>Precision of interactions</b></td><td>High (local)</td><td>Highest (exact pairwise)</td><td>Good (compressed)</td></tr>
-      <tr><td><b>Examples in bioinformatics</b></td><td>DeepSEA, Basset</td><td>AlphaFold, ESM, DNABERT</td><td>Evo 2, Caduceus</td></tr>
+      <tr><td><b>How it looks at data</b></td><td>Each position independently</td><td>Small sliding window</td><td>Every position vs. every other</td><td>Compact running memory</td></tr>
+      <tr><td><b>Range</b></td><td>None (single position)</td><td>Local only</td><td>Global (all pairs)</td><td>Global (via state)</td></tr>
+      <tr><td><b>Speed for long sequences</b></td><td>O(n) — linear</td><td>O(n) — linear</td><td>O(n&sup2;) — quadratic</td><td>O(n log n) — near-linear</td></tr>
+      <tr><td><b>1M sequence feasible?</b></td><td>Yes</td><td>Yes (but only local)</td><td>No (too expensive)</td><td>Yes</td></tr>
+      <tr><td><b>Sees neighbors?</b></td><td>No</td><td>Nearby only</td><td>All positions</td><td>All (compressed)</td></tr>
+      <tr><td><b>Role in Evo 2</b></td><td>Embedding, thinking layers, output</td><td>Inside Hyena operator</td><td>5 of 32 layers (~16%)</td><td>27 of 32 layers (~84%)</td></tr>
+      <tr><td><b>Examples in bioinformatics</b></td><td>Inside all models</td><td>DeepSEA, Basset</td><td>AlphaFold, ESM, DNABERT</td><td>Evo 2, Caduceus</td></tr>
     </tbody>
   </table>
 </div>
@@ -351,6 +388,60 @@ function drawNN() {
   ctx.strokeStyle='#4fc3f744'; ctx.lineWidth=1.5;
   ctx.beginPath(); ctx.moveTo(50,h/2); ctx.lineTo(w-50,h/2); ctx.stroke();
   txt(ctx, 'Data flows left to right through layers', w/2, h-5, '#3a4a68', 9);
+}
+
+// ─── MLP Diagram ───
+function drawMLP() {
+  const {ctx,w,h} = setupCanvas('mlpDiagram');
+  ctx.fillStyle='#0a0e18'; ctx.fillRect(0,0,w,h);
+
+  const layers = [
+    {n:4, label:'Input', color:'#ffb74d'},
+    {n:6, label:'Hidden 1', color:'#ffa726'},
+    {n:6, label:'Hidden 2', color:'#ffa726'},
+    {n:3, label:'Output', color:'#ff9800'},
+  ];
+  const lx = layers.map((_,i) => 120 + i * ((w-240) / (layers.length-1)));
+
+  // Draw connections
+  for(let l=0; l<layers.length-1; l++) {
+    for(let i=0; i<layers[l].n; i++) {
+      for(let j=0; j<layers[l+1].n; j++) {
+        const y1 = 40 + i * ((h-100) / (layers[l].n-1));
+        const y2 = 40 + j * ((h-100) / (layers[l+1].n-1));
+        ctx.strokeStyle = '#ffb74d15';
+        ctx.lineWidth = 0.8;
+        ctx.beginPath(); ctx.moveTo(lx[l], y1); ctx.lineTo(lx[l+1], y2); ctx.stroke();
+      }
+    }
+  }
+
+  // Highlight one path
+  const pathNodes = [1, 3, 2, 1]; // indices in each layer
+  for(let l=0; l<pathNodes.length-1; l++) {
+    const y1 = 40 + pathNodes[l] * ((h-100) / (layers[l].n-1));
+    const y2 = 40 + pathNodes[l+1] * ((h-100) / (layers[l+1].n-1));
+    ctx.strokeStyle = '#ffa72666'; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(lx[l], y1); ctx.lineTo(lx[l+1], y2); ctx.stroke();
+  }
+
+  // Draw nodes
+  for(let l=0; l<layers.length; l++) {
+    for(let i=0; i<layers[l].n; i++) {
+      const y = 40 + i * ((h-100) / (layers[l].n-1));
+      ctx.fillStyle = '#0a0e18';
+      ctx.beginPath(); ctx.arc(lx[l], y, 12, 0, Math.PI*2); ctx.fill();
+      ctx.strokeStyle = layers[l].color; ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.arc(lx[l], y, 12, 0, Math.PI*2); ctx.stroke();
+    }
+    txtB(ctx, layers[l].label, lx[l], h-16, layers[l].color, 10);
+  }
+
+  // Annotations
+  txt(ctx, 'Every input connects to every output in each layer ("fully connected")', w/2, h-3, '#3a4a68', 9);
+  txt(ctx, 'multiply', (lx[0]+lx[1])/2, 25, '#5a6a88', 8);
+  txt(ctx, '+ sum', (lx[1]+lx[2])/2, 25, '#5a6a88', 8);
+  txt(ctx, 'activate', (lx[2]+lx[3])/2, 25, '#5a6a88', 8);
 }
 
 // ─── Convolution Diagram ───
@@ -520,12 +611,13 @@ function drawSSM() {
 
 // ─── Draw all diagrams ───
 drawNN();
+drawMLP();
 drawConv();
 drawAttn();
 drawSSM();
 
 // Redraw on resize
-window.addEventListener('resize', () => { drawNN(); drawConv(); drawAttn(); drawSSM(); });
+window.addEventListener('resize', () => { drawNN(); drawMLP(); drawConv(); drawAttn(); drawSSM(); });
 
 // ─── Sticky hero: compact on scroll ───
 const heroWrap = document.getElementById('heroWrap');
