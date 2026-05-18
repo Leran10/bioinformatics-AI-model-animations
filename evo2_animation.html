@@ -49,6 +49,11 @@
   .takeaway { background:#81c78412; border:1px solid #81c78433; border-radius:8px; padding:7px 12px; margin:6px 0; font-size:.84rem; color:#a8d8a0; }
   .takeaway::before { content:'Key idea: '; font-weight:700; color:#81c784; }
 
+  /* ── Architecture badge ── */
+  .arch-badge { display:inline-flex; align-items:center; gap:4px; font-size:.72rem; font-weight:600; padding:3px 10px; border-radius:6px; letter-spacing:.3px; vertical-align:middle; }
+  .arch-uses { background:#0d1525; border:1px solid #1e2a44; border-radius:8px; padding:6px 12px; margin:0 0 8px; font-size:.82rem; color:#6b7fa0; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .arch-uses b { color:#8892a8; font-weight:600; }
+
   /* ── Legend ── */
   #legend { display:flex; justify-content:center; gap:18px; padding:4px 12px; flex-wrap:wrap; font-size:.78rem; }
   .leg { display:flex; align-items:center; gap:6px; color:#8892a8; }
@@ -132,64 +137,94 @@ function J(term, tip) {
   return `<span class="jargon">${term}<span class="tip">${tip}</span></span>`;
 }
 
+// ─── Helper: architecture badge HTML ───
+function archBadge(type) {
+  const map = {
+    'none':        {bg:'#ffffff08', border:'#ffffff22', color:'#6b7fa0', label:'No AI model yet — just data prep'},
+    'mlp':         {bg:'#ffb74d18', border:'#ffb74d', color:'#ffcc80', label:'MLP (lookup table)'},
+    'ssm':         {bg:'#81c78418', border:'#81c784', color:'#a5d6a7', label:'SSM / Hyena (convolution)'},
+    'ssm-short':   {bg:'#81c78418', border:'#81c784', color:'#a5d6a7', label:'SSM / Hyena — Short Convolution'},
+    'ssm-medium':  {bg:'#aed58118', border:'#aed581', color:'#c5e1a5', label:'SSM / Hyena — Medium Convolution'},
+    'ssm-long':    {bg:'#66bb6a18', border:'#66bb6a', color:'#a5d6a7', label:'SSM / Hyena — Long Convolution'},
+    'transformer': {bg:'#ab47bc18', border:'#ce93d8', color:'#ce93d8', label:'Transformer (Attention)'},
+    'hybrid':      {bg:'#4fc3f718', border:'#4fc3f7', color:'#4fc3f7', label:'Hybrid: SSM + Transformer + MLP'},
+    'softmax':     {bg:'#ffa72618', border:'#ffa726', color:'#ffcc80', label:'MLP + Softmax (output layer)'},
+  };
+  const m = map[type] || map['none'];
+  return `<span class="arch-badge" style="background:${m.bg};border:1px solid ${m.border};color:${m.color}">${m.label}</span>`;
+}
+function archLine(...types) {
+  return `<div class="arch-uses"><b>Architecture used:</b> ${types.map(t => archBadge(t)).join(' ')}</div>`;
+}
+
 // ─── Steps definition (beginner-friendly) ───
 const STEPS = [
   { id:'input', title:'Step 1 — Reading the DNA',
     text:`
+      ${archLine('none')}
       <div class="main-text">Evo 2 starts by reading a <span class="hl3">raw DNA sequence</span> — the letters A, T, G, and C that make up every genome. Just like you read a sentence letter by letter, Evo 2 reads DNA <b>one nucleotide (letter) at a time</b>.</div>
       <div class="analogy">Think of DNA as a book written in a 4-letter alphabet. While English has 26 letters, DNA only has 4: <b>A</b> (adenine), <b>T</b> (thymine), <b>G</b> (guanine), and <b>C</b> (cytosine). Evo 2 reads this book from left to right.</div>
       <div class="takeaway">The input is just raw text — a string of A, T, G, C letters. No preprocessing or human-designed features needed.</div>
     `},
   { id:'tokenize', title:'Step 2 — Converting Letters to Numbers',
     text:`
+      ${archLine('none')}
       <div class="main-text">Computers cannot work with letters directly — they need numbers. So each DNA letter is assigned a unique number (called a ${J('token ID','A token is the smallest unit the model works with. Here, each nucleotide letter becomes one token. Token ID is just its assigned number in the dictionary.')}). For example: A&rarr;1, C&rarr;2, G&rarr;3, T&rarr;4. This step is called ${J('tokenization','Tokenization = splitting input into pieces and converting each piece to a number. Some AI models group multiple letters together, but Evo 2 keeps it simple: 1 letter = 1 token.')}.</div>
       <div class="analogy">Imagine assigning jersey numbers to players. Each player (nucleotide) gets a unique number. The computer then works with these jersey numbers instead of names. A 1-million-letter genome becomes a list of 1 million numbers.</div>
       <div class="takeaway">Each DNA letter becomes a simple number. The model has a "dictionary" of 512 possible tokens (A, C, G, T, N for unknown, plus some special markers).</div>
     `},
   { id:'embed', title:'Step 3 — Giving Each Letter a Rich Description',
     text:`
+      ${archLine('mlp')}
       <div class="main-text">A single number (like "3" for G) carries almost no information. So the model looks up each token in a big table and replaces it with a ${J('vector','A vector is a list of numbers. Think of it as a detailed description card. Instead of just "G = 3", the model uses a list of 4,096 numbers to describe G in a rich, nuanced way.')} — a list of <b>4,096 numbers</b>. This is called ${J('embedding','Embedding = converting a simple ID into a rich numerical description. The model learns these descriptions during training so that similar tokens get similar descriptions.')}.</div>
       <div class="analogy">Imagine each DNA letter has a detailed profile card with 4,096 traits (like a character sheet in a game). "G" is no longer just the number 3 — it becomes a rich description that the model can reason about. These profiles are learned from billions of genomes during training.</div>
       <div class="takeaway">Each nucleotide goes from a simple number to a rich list of 4,096 values. This is where the model starts to "understand" the meaning behind each letter.</div>
     `},
   { id:'hcs', title:'Step 4 — Scanning for Tiny Local Patterns',
     text:`
+      ${archLine('ssm-short')}
       <div class="main-text">Now the real processing begins. The first type of layer is a <span class="hl3">short-range pattern detector</span> (called ${J('Hyena Short Convolution','Hyena is the name of the mathematical technique used here. "Convolution" means sliding a small window across the sequence to detect patterns — like running a magnifying glass across a page. "Short" means the window is very small (~7 letters wide).')}). It slides a tiny window (~7 letters wide) across the DNA, looking for <b>small local patterns</b>.</div>
       <div class="analogy">Imagine highlighting 3-letter words in a book. In DNA, a 3-letter pattern (codon) like "ATG" means "start building a protein here." This layer spots these small neighborhood patterns — dinucleotides (2-letter combos), codons (3-letter codes), and other tiny motifs.</div>
       <div class="takeaway">This layer asks: "What small patterns exist in each tiny neighborhood?" It scans ~7 letters at a time to find local signals like codons and short regulatory motifs.</div>
     `},
   { id:'hcm', title:'Step 5 — Detecting Medium-Range Features',
     text:`
+      ${archLine('ssm-medium')}
       <div class="main-text">Next, a <span class="hl3">medium-range pattern detector</span> (${J('Hyena Medium Convolution','Same sliding-window idea as the short convolution, but the window is now ~128 letters wide. This lets it see features that span a whole promoter or regulatory region.')}) scans the sequence with a wider window (~128 letters). This captures biological features like ${J('promoters','A promoter is a DNA region (usually 50-200 letters) that sits just before a gene and tells the cell "start reading the gene here." It is like a chapter title in our book analogy.')} and ${J('regulatory elements','Regulatory elements are DNA regions that control when and how much a gene is active. Think of them as volume knobs for genes — they can turn genes up, down, or off.')}.</div>
       <div class="analogy">Now imagine reading whole sentences instead of individual words. You can understand things like "this sentence introduces a new paragraph" (a promoter introducing a gene). The medium window sees features that span 50-200 letters — things too big for the tiny window to catch.</div>
       <div class="takeaway">This layer asks: "What paragraph-level patterns exist?" It detects promoters, ribosome binding sites, and other regulatory features spanning ~50-200 base pairs.</div>
     `},
   { id:'hcl', title:'Step 6 — Understanding Long-Range Relationships',
     text:`
+      ${archLine('ssm-long')}
       <div class="main-text">The <span class="hl3">long-range pattern detector</span> (${J('Hyena Long Convolution','The window now spans the ENTIRE sequence — up to 1 million letters. It uses a math trick called FFT (Fast Fourier Transform) to do this efficiently. Without this trick, processing 1 million positions would be impossibly slow.')}) looks at the <b>entire sequence at once</b> — up to 1 million letters! It captures relationships between distant parts of the genome, like how a ${J('regulatory region','A stretch of DNA, sometimes thousands of letters away from a gene, that still controls that gene. Like a remote control that works from across the room.')} far away can control a distant gene.</div>
       <div class="analogy">Now imagine understanding how Chapter 1 of a book connects to Chapter 20. In genomes, a control switch can sit thousands of letters away from the gene it controls. This layer reads the whole book at once to find these long-distance connections. It uses a math shortcut (${J('FFT','Fast Fourier Transform — a clever math trick that lets the model process the entire sequence quickly. Without it, comparing every position to every other would take quadratically longer. With FFT, doubling the sequence length only slightly increases computation time.')}) to do this fast.</div>
       <div class="takeaway">This layer asks: "How do distant parts of this genome relate to each other?" It can see connections spanning up to 1 million letters — entire operons, gene clusters, and chromosome-scale patterns.</div>
     `},
   { id:'attn', title:'Step 7 — Comparing Every Position to Every Other',
     text:`
+      ${archLine('transformer')}
       <div class="main-text">A small number of layers (~5 out of 32) use a different technique called ${J('attention','Attention lets every position in the sequence "look at" every other position and decide which ones are most relevant. It creates a score between every pair of positions — like a table showing how related each letter is to every other letter.')}. Unlike the sliding-window approach, attention lets <b>every single position directly communicate with every other position</b>. It creates a ${J('score matrix','A big table where each row and column is a position in the sequence. Each cell contains a score showing how "related" those two positions are. High scores mean the model thinks those positions are important to each other.')} showing how related each pair of positions is.</div>
       <div class="analogy">Imagine a classroom where every student can pass notes to every other student simultaneously. The sliding-window layers are like students whispering to neighbors; attention is like an open discussion where everyone hears everyone. It also uses ${J('positional encoding (RoPE)','The model needs to know WHERE each letter is in the sequence (position 1 vs position 1000). RoPE (Rotary Position Embedding) is a way to encode "I am at position X" into the data, like page numbers in a book.')} — basically page numbers — so the model knows the position of each letter.</div>
       <div class="takeaway">Attention = every position can directly talk to every other position. Only 16% of layers use this (it is computationally expensive), but it provides critical global awareness that the sliding-window layers cannot.</div>
     `},
   { id:'pattern', title:'Step 8 — Stacking 32 Layers: The Full Pipeline',
     text:`
+      ${archLine('ssm', 'transformer')}
       <div class="main-text">Evo 2 stacks <b>32 processing layers</b> in a repeating pattern: <span class="hl3">Short</span> &rarr; <span class="hl3">Medium</span> &rarr; <span class="hl3">Long</span> &rarr; <span class="hl">Attention</span>, repeated ~8 times. Each layer also includes a ${J('thinking layer (MLP)','MLP stands for Multi-Layer Perceptron — a small neural network inside each layer that processes information. Think of it as a "thinking step" where the model digests what the pattern detectors found.')} and ${J('residual connections','A shortcut wire that adds the original input back to the output of each layer. This prevents the "telephone game" problem — information does not degrade as it passes through many layers. Like keeping a copy of the original message.')}.</div>
       <div class="analogy">Think of an assembly line with 32 workstations. First, a worker examines small details (short patterns). Next, another checks medium features. Then one looks at the big picture. Finally, one does a full cross-check (attention). After each station, there is a "thinking step" where findings are processed, plus a "safety copy" of the original is kept so nothing gets lost. This cycle repeats 8 times, building deeper understanding each round.</div>
       <div class="takeaway">The model processes DNA through 32 layers, alternating between local, medium, long-range pattern detection, and global attention — building progressively deeper understanding at each layer.</div>
     `},
   { id:'output', title:'Step 9 — Making the Final Decision',
     text:`
+      ${archLine('softmax')}
       <div class="main-text">After all 32 layers, the model's understanding is ${J('normalized','Normalization adjusts the numbers so they are on a similar scale — preventing any single value from dominating. Like adjusting the volume on different microphones so all speakers sound balanced.')} (balanced), then passed through an ${J('output layer','A simple mathematical transformation that converts the model internal 4,096-number description into 512 scores — one for each possible next token in the dictionary.')} that produces a score for each possible next letter. Finally, ${J('softmax','A mathematical function that converts raw scores into probabilities that add up to 100%. For example, raw scores [2.0, 5.0, 1.0, 0.5] might become [T: 72%, G: 15%, A: 5%, C: 8%]. The highest-scoring letter is the model prediction.')} converts these scores into <b>probabilities</b> — the chance that each letter (A, T, G, or C) comes next.</div>
       <div class="analogy">Think of a panel of expert judges after watching a performance. Each judge has formed an opinion (the 32 layers of processing). Now they vote: "How likely is it that the next letter is A? T? G? C?" The votes are tallied into percentages. If the judges say 72% T, 15% G, 8% C, 5% A — the model predicts T is most likely next.</div>
       <div class="takeaway">The final output is simple: a probability for each of the 4 DNA letters. "Given everything before this position, there is a 72% chance the next letter is T."</div>
     `},
   { id:'predict', title:'Step 10 — What Can Evo 2 Actually Do?',
     text:`
+      ${archLine('hybrid')}
       <div class="main-text">Evo 2 has two main uses:<br><br>
       <b>1. Scoring sequences</b> — Feed in a DNA sequence and ask "how natural does this look?" The model assigns a ${J('likelihood score','A number representing how probable or "normal" this sequence looks to the model. Natural, functional sequences get high scores. Mutated or broken sequences get low scores.')} to every position. This enables <b>zero-shot variant effect prediction</b>: compare a normal gene vs. a mutated version — if the mutant scores much lower, the mutation is probably harmful.<br><br>
       <b>2. Generating new DNA</b> — The model predicts the next letter, adds it to the sequence, then predicts the next one, and so on — like autocomplete for DNA. This can design entirely new genes, promoters, or even whole genomes.</div>
